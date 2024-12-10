@@ -1,0 +1,3228 @@
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> Create Or Alter Procedure dbo.Spc_valida_longitud    
+   (@PsTabla             Sysname,  
+    @PsColumna           Sysname,  
+    @PbAplica            Bit          = 0    Output,  
+    @PsTipoCampo         Varchar(250) = ' '  Output,  
+    @PnLogitud           Smallint     = ' '  Output,  
+    @PnDecimales         Smallint     = 0    Output,  
+    @PsRequerido         Char(2)      = 'No' Output,  
+    @PnEstatus           Integer      = 0    Output,  
+    @PsMensaje           Varchar(250) = ' '  Output)    
+    
+As  
+Declare   
+    @w_longitud          Integer = 0,  
+    @w_system_type_id    Integer,  
+    @w_scale             Tinyint,  
+    @w_desc_error        Varchar( 250),  
+    @w_Error             Integer,  
+    @w_Precision         Smallint  
+  
+     
+Begin  
+   Set Nocount       On  
+   Set Xact_Abort    On  
+   Set Ansi_Nulls    On  
+   Set Ansi_Warnings On  
+   Set Ansi_Padding  On  
+     
+   Select @PnEstatus  = 0,  
+          @PsMensaje  = Null   
+  
+   Begin Try  
+      Select @w_system_type_id = a.system_type_id,   
+             @w_longitud       = a.max_length,   
+             @w_Precision      = a.precision,  
+             @w_scale          = a.scale,  
+             @PsTipoCampo      = Cast(b.name As Varchar(250)),  
+             @PsRequerido      = Case When a.Is_nullable = 0  
+                                      Then 'Si'  
+                                      Else 'No'  
+                                 End  
+      From   sys.columns a  
+      Join   sys.types b on b.system_type_id = a.system_type_id  
+      Where  a.name   = @PsColumna  
+      And    Exists   ( Select Top 1 1  
+                        From   sys.tables c  
+                        Where  c.object_id = a.object_id  
+                        And    c.name      = @PsTabla)  
+   End Try  
+  
+   Begin Catch  
+      Select  @w_Error      = @@Error,  
+              @w_desc_error = Substring (Error_Message(), 1, 230)  
+   End   Catch  
+  
+   If Isnull(@w_Error, 0) <> 0  
+      Begin  
+         Select @PnEstatus = @w_Error,  
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error  
+         Set Xact_Abort Off  
+         Return  
+      End  
+  
+   If @w_system_type_id not in (34, 35, 58, 59, 60, 61, 62, 104, 189)  
+      Begin  
+         Set @PbAplica = 1  
+         If @w_Precision = 0  
+            Begin  
+               Set @w_Precision = @w_longitud  
+            End  
+  
+         Select @PnLogitud    = @w_Precision,  
+                @PnDecimales  = @w_scale  
+      End  
+  
+  
+   Set Xact_Abort Off  
+   Return  
+End  
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que consulta la longitud de los campos de una tabla específica.',
+   @w_procedimiento  NVarchar(250) = 'Spc_valida_longitud';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> Create Or Alter Procedure Spc_Lista_Det_Tablas
+  (@PsTabla      Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0   Output,
+   @PsMensaje    Varchar(250) = ' ' Output)
+As
+
+Declare
+  C_tablas Cursor For
+  Select   Name, id
+  from     Sysobjects 
+  Where    Uid     = 1
+  And      Type    = 'U'
+  And      Name    = Case When @PsTabla Is Null
+                          Then Name
+                          Else @PsTabla
+                     End
+  Order    By 1
+
+Declare
+   @w_tabla         Sysname,
+   @w_columna       Sysname,
+   @w_idTabla       Integer,
+   @w_column_id     Integer,
+   @w_column_idx    Integer,
+   @w_column_Fk     Integer,
+   @w_TipoCampo     Varchar(250),
+   @w_Longitud      Integer,
+   @w_Decimales     Integer,
+   @w_requerido     Char(2),
+   @w_aplica        Bit,
+   @w_desc_error    Varchar( 250),
+   @w_Error         Integer,
+   @w_descripcion   NVarchar(1500)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    Off
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Create table #Tmp_Objectos
+   (Orden       SmallInt     Not Null,
+    BaseDatos   Sysname      Default ' ',
+    Objeto      Sysname      Default ' ', 
+    Tabla       Sysname      Default ' ',
+    idcolumna   Integer          Null,
+    Columna     Sysname      Default ' ',
+    Tipo        Varchar(250) Default ' ',
+    Longitud    Varchar(20)  Default ' ',
+    Decimales   Varchar(20)  Default ' ',
+    Requerido   Char(2)      Default ' ',
+    Llave_Prim  Varchar(5)   Default ' ',
+    Llave_For   Varchar(5)   Default ' ',
+    Descripcion NVarchar(1500))
+
+   Set @w_descripcion = ''
+
+   Insert Into #Tmp_Objectos
+   (Orden, BaseDatos, Descripcion)
+   Select 0, db_Name(), (Select Cast(Value As NVarchar(1550))
+      From   fn_listextendedproperty('MS_Description', Null, Null, Null, Null, 
+              Null, Null))
+
+   Open  C_tablas
+   While @@Fetch_status < 1
+   Begin
+      Fetch C_tablas Into @w_tabla, @w_idTabla
+      If @@Fetch_status <> 0
+         Begin
+            Break
+         End
+
+      Set @w_descripcion = ''
+      Select @w_descripcion = Cast(Value As NVarchar(1550))
+      From   fn_listextendedproperty('MS_Description', 'SCHEMA', 'dbo', 'table', @w_tabla, 
+              Null, Null)
+
+      Insert Into #Tmp_Objectos
+      (Orden, Objeto, tabla, Descripcion)
+      Values (1, @w_tabla, @w_tabla, @w_descripcion)
+      
+      Declare
+         C_columnas Cursor For
+           Select Name, Column_id
+           From   sys.columns 
+           Where  Object_id = @w_idTabla
+           Order  By Column_id
+           
+      Begin
+         Open   C_columnas
+         While  @@Fetch_Status < 1
+         Begin
+            Fetch C_columnas Into @w_columna, @w_column_id
+            If @@Fetch_status <> 0
+               Begin 
+                  Break
+               End
+
+            Select @w_column_idx = b.key_ordinal
+            From   sys.indexes i
+            Join   sys.index_columns  b  
+            On     i.object_id                         = b.object_id 
+            And    i.index_id                          = b.index_id
+            And    Col_name(b.object_id, b.column_id)  = @w_columna
+            And    b.column_id                         = @w_column_id
+            Where  i.object_id                         = @w_idTabla
+            And    i.is_primary_key                    = 1
+            If @@Rowcount = 0
+               Begin
+                  Set  @w_column_idx  = 0
+               End
+
+            Select @w_column_fk = 1
+            From   sys.tables a
+            Join   sys.sysforeignkeys b
+            On     b.fkeyid    = a.object_id
+            Join   sys.columns c
+            On     c.object_id = b.rkeyid
+            And    c.Name      = @w_columna
+            Where  a.object_id = @w_idTabla
+            If @@Rowcount = 0
+               Begin
+                  Set @w_column_fk = 0
+               End
+
+            Select @w_column_idx = Isnull(@w_column_idx, 0),
+                   @w_column_fk  = Isnull(@w_column_fk,  0)
+
+            Set @w_descripcion = ''
+            Select @w_descripcion = Cast(Value As NVarchar(1550))
+            From   fn_listextendedproperty('MS_Description', 'Schema', 'dbo', 'table', @w_tabla, 
+                    'Column', @w_columna)
+            
+            Execute Spc_valida_longitud @w_Tabla,     @w_Columna,   
+                                        @w_Aplica     Output,     @w_TipoCampo Output, @w_Longitud  Output,
+                                        @w_Decimales  Output,     @w_requerido Output, @PnEstatus   Output,
+                                        @PsMensaje    Output 
+  
+            If @PnEstatus = 0
+               Begin
+                  Begin Try
+                     Insert Into #Tmp_Objectos
+                    (Orden,  Objeto, idcolumna, Columna,  Tipo, Longitud, Decimales,
+                     Requerido, Llave_Prim, Llave_For, Descripcion)
+                     Select  2, @w_tabla, @w_column_id, @w_columna, @w_TipoCampo,
+                            Cast(@w_longitud As Varchar(20)), 
+                            Case When @w_decimales = 0
+                                 Then ' '
+                                 Else Cast(@w_decimales As Varchar)
+                            End, @w_requerido,
+                            Case When @w_column_idx = 0
+                                 Then ' '
+                                 Else Cast(@w_column_idx As Varchar)
+                            End,
+                            Case When @w_column_fk  = 0
+                                 Then ' '
+                                 Else 'Si'
+                            End, @w_descripcion
+                  End Try
+
+                  Begin Catch
+                     Select  @w_Error      = @@Error,
+                             @w_desc_error = Substring (Error_Message(), 1, 230)
+                  End   Catch
+
+                  If Isnull(@w_Error, 0) <> 0
+                     Begin
+                        Select @PnEstatus = @w_Error,
+                               @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+                        Select @PsMensaje
+
+                        Set Xact_Abort Off
+                        Return
+                     End
+               End
+            Else
+               Begin
+                  Select @PnEstatus, @PsMensaje
+               End
+         End
+         Close      C_columnas
+         Deallocate C_columnas
+      End
+      
+   End
+   Close      C_tablas
+   Deallocate C_tablas
+   
+   Select BaseDatos "Base de Datos", Tabla, Columna, tipo "Tipo de Dato", longitud + Case When Decimales != ' '
+                                                           Then ', ' + Decimales
+                                                           Else ' '
+                                                       End Longitud,
+          Requerido, Llave_Prim "LLave Primaria", Descripcion "Descripción"
+
+   From   #Tmp_Objectos
+   Order By Objeto, idcolumna
+   
+   Return
+   
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que consulta los datos de tablas de una BD específica.',
+   @w_procedimiento  NVarchar(250) = 'Spc_Lista_Det_Tablas';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> Create Or Alter Procedure spc_busca_campos
+  (@PsCampo    Varchar(  90),
+   @PnEstatus  Integer       = 0  Output,
+   @PsMensaje  Varchar( 250) = '' Output)
+With Encryption
+As
+
+Declare
+   @w_desc_error              Varchar( 250),
+   @w_Error                   Integer
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null
+
+
+   Begin Try
+      Select a.name, b.name, b.column_id
+      From   sys.tables a, sys.columns b
+      Where  a.object_id = b.object_id
+      And    b.name      Like '%' + rtrim(ltrim(@Pscampo)) + '%'
+      Order by 3, 1
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que consulta los campos de una BD.',
+   @w_procedimiento  NVarchar(250) = 'spc_busca_campos';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> 203> 204> 205> 206> 207> 208> 209> 210> 211> 212> 213> 214> 215> 216> 217> 218> 219> 220> 221> 222> 223> 224> 225> 226> 227> 228> 229> 230> 231> 232> 233> 234> 235> 236> 237> 238> 239> 240> 241> 242> 243> 244> 245> 246> 247> 248> 249> 250> 251> 252> 253> 254> 255> 256> 257> 258> 259> 260> 261> 262> 263> 264> 265> 266> 267> 268> 269> 270> 271> 272> 273> 274> 275> 276> 277> 278> 279> 280> 281> 282> 283> 284> 285> 286> 287> 288> -- /*
+
+-- Procedimiento que lista los tamaños de las tablas.
+
+-- Declare
+   -- @PsTablas                    Varchar(4000)    = Null,
+   -- @PnRegistrosMinimos          Integer          = 0,
+   -- @PnOrden                     Tinyint          = 2,
+   -- @PnEstatus                   Integer          = 0,
+   -- @PsMensaje                   Varchar(  250)   = ' '
+
+-- Begin
+   -- Execute  Spc_AnalisisTabla @PsTablas           = @PsTablas,
+                              -- @PnRegistrosMinimos = @PnRegistrosMinimos,
+                              -- @PnOrden            = @PnOrden,
+                              -- @PnEstatus          = @PnEstatus Output,
+                              -- @PsMensaje          = @PsMensaje Output
+
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+
+-- */
+
+Create Or Alter Procedure dbo.Spc_AnalisisTabla
+  (@PsTablas                    Varchar(4000)    = Null,
+   @PnRegistrosMinimos          Integer          = 0,
+   @PnOrden                     Tinyint          = 1,
+   @PnEstatus                   Integer          = 0   Output,
+   @PsMensaje                   Varchar(  250)   = ' ' Output)
+As
+
+Declare
+   @w_desc_error              Varchar( 250),
+   @w_Error                   Integer,
+   @w_idEstatus               Tinyint,
+   @w_idTipoUsuario           Tinyint,
+   @w_comilla                 Char(1),
+   @w_sql                     Varchar(Max),
+   @w_tablas                  Varchar(4000),
+   @w_tabla                   Sysname,
+   @w_existe                  Bit,
+   @w_pos                     Integer,
+   @w_len                     Integer
+
+Begin
+
+/*
+Objetivo: lista los tamaños de las tablas
+Versión:  1
+
+*/
+
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    Off
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Select @PnEstatus       = 0,
+          @PsMensaje       = ' ',
+          @w_comilla       = Char(39);
+
+   Set @w_tabla = Rtrim('segDimTablas_' +
+                  Substring(Replace(Cast(Newid() As Varchar(Max)), '-', ''), 1, 12))
+
+   Set @w_existe = dbo.Fn_existe_tabla(@w_tabla)
+
+   If @w_existe = 1
+      Begin
+         Set @w_sql = 'Drop Table Dbo.' + @w_tabla
+
+         Begin Try
+            Execute (@w_sql)
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_desc_error = Substring (Error_Message(), 1, 230)
+         End   Catch
+
+         If Isnull(@w_Error, 0) <> 0
+            Begin
+               Select @PnEstatus = @w_Error,
+                      @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+               Set Xact_Abort Off
+               Return
+            End
+
+      End
+
+   Set @w_sql   = 'Create     Table dbo.' + @w_tabla    + ' ' +
+                  '(tabla               Sysname      Not Null, '    +
+                   'registros           Integer      Not Null, '    +
+                   'espacioInicialKB    Varchar(18)  Not Null, '    +
+                   'espacioDatosKB      Varchar(18)  Not Null, '    +
+                   'espacioIndicesKB    Varchar(18)  Not Null, '    +
+                   'disponibleKB        Varchar(18)  Not Null, '    +
+                   'Primary Key (tabla)) '
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+         Set Xact_Abort Off
+         Return
+      End
+
+
+   Set @w_sql = 'Insert into dbo.' + @w_tabla + ' ' +
+                'Execute sp_msForEachTable '     + @w_comilla +
+                         'Execute sp_spaceused ' + @w_comilla + @w_comilla + '?' + @w_comilla + @w_comilla + @w_comilla
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+         Set Xact_Abort Off
+         Return
+      End
+
+  Set @w_sql = 'Update ' + @w_tabla + '
+                Set   espacioInicialKB = Replace(espacioInicialKB, ' + @w_comilla + 'KB' + + @w_comilla + ', Char(32)),
+                      espacioDatosKB   = Replace(espacioDatosKB, '   + @w_comilla + 'KB' + + @w_comilla + ', Char(32)),
+                      espacioIndicesKB = Replace(espacioIndicesKB, ' + @w_comilla + 'KB' + + @w_comilla + ', Char(32)),
+                      disponibleKB     = Replace(disponibleKB, '     + @w_comilla + 'KB' + + @w_comilla + ', Char(32))'
+
+  Execute (@w_sql)
+
+/*
+  Set @w_sql = 'Update ' + @w_tabla + '
+                Set   espacioInicialKB = Cast(espacioInicialKB As Integer) / 1024,
+                      espacioDatosKB   = Cast(espacioDatosKB   As Integer) / 1024,
+                      espacioIndicesKB = Cast(espacioIndicesKB As Integer) / 1024,
+                      disponibleKB     = Cast(disponibleKB     As Integer) / 1024'
+
+  Execute (@w_sql)
+
+*/
+
+  Set @w_sql = 'Select tabla, registros,  Cast(espacioInicialKB As Integer) espacioInicialKB,
+                                          Cast(espacioDatosKB   As Integer) espacioDatosKB,
+                                          Cast(espacioIndicesKB As Integer) espacioIndicesKB,
+                                          Cast(disponibleKB     As Integer) disponibleKB
+                From   ' + @w_tabla + '
+                where  1 = 1 '
+
+  If @PsTablas Is Not Null
+     Begin
+        Select @w_len    = len(@PsTablas),
+               @w_pos    = 0,
+               @w_tablas = ''
+
+        While @w_pos < @w_len
+        Begin
+           Set @w_pos = @w_pos + 1
+
+           If Substring(@PsTablas, @w_pos, 1) = ','
+              Begin
+                 Set @w_tablas = Ltrim(Rtrim(@w_tablas)) + @w_comilla + ', ' + @w_comilla
+              End
+           Else
+              Begin
+                 Set @w_tablas = Ltrim(Rtrim(@w_tablas)) + Substring(@PsTablas, @w_pos, 1)
+              End
+        End
+
+        Set @w_sql = @w_sql + ' And tabla In (' + @w_comilla + @w_tablas + @w_comilla + ')'
+
+     End
+  Else
+     Begin
+        Set @w_sql = @w_sql + ' And registros >= ' + Cast(@PnRegistrosMinimos As Varchar)
+     End
+
+  Set @w_sql = @w_sql + ' And  Tabla != ' +  @w_comilla + @w_tabla +  @w_comilla;
+
+  If @PnOrden = 0
+     Begin
+        Set @w_sql = @w_sql + ' Order By tabla'
+     End
+
+  If @PnOrden = 1
+     Begin
+        Set @w_sql = @w_sql + ' Order By Registros Desc, tabla'
+     End
+
+  If @PnOrden = 2
+     Begin
+        Set @w_sql = @w_sql + ' Order By espacioInicialKB Desc, tabla'
+     End
+
+  If @PnOrden = 3
+     Begin
+        Set @w_sql = @w_sql + ' Order By espacioDatosKB Desc, tabla'
+     End
+
+  If @PnOrden = 4
+     Begin
+        Set @w_sql = @w_sql + ' Order By disponibleKB Desc, tabla'
+     End
+
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set @w_existe = dbo.Fn_existe_tabla(@w_tabla)
+
+   If @w_existe = 1
+      Begin
+         Set @w_sql = 'Drop Table Dbo.' + @w_tabla
+
+         Begin Try
+            Execute (@w_sql)
+         End Try
+
+         Begin Catch
+      Select  @w_Error      = @@Error,
+                    @w_desc_error = Substring (Error_Message(), 1, 230)
+         End   Catch
+
+         If Isnull(@w_Error, 0) <> 0
+            Begin
+               Select @PnEstatus = @w_Error,
+                      @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+
+               Set Xact_Abort Off
+               Return
+            End
+
+      End
+
+  Set Xact_Abort Off
+  Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que Analiza los datos de tablas de una BD específica.',
+   @w_procedimiento  NVarchar(250) = 'Spc_AnalisisTabla';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> 203> 204> 205> 206> 207> 208> 209> 210> 211> 212> 213> 214> 215> 216> 217> 218> 219> 220> 221> 222> 223> 224> 225> 226> Create Or Alter Procedure Spc_lista_dim_tablas
+  (@PsTabla             Sysname        = Null,
+   @PnFilas             Integer        = 0,
+   @PnEstatus           Integer        = 0    Output,
+   @PsMensaje           Varchar(250)   = ' '  Output)
+As
+
+Declare
+   @w_Error                  Integer,
+   @w_desc_error             Varchar ( 250),
+   @w_tabla                  Sysname,
+   @w_id                     Integer,
+   @w_operacion              Integer,
+   @w_pages                  Integer,
+   @w_sql                    Varchar(Max),
+   @w_comilla                Char(1)
+
+Begin
+   Set Quoted_identifier Off
+   Set Nocount            On
+   Set Xact_Abort         On
+   Set Ansi_Nulls         Off
+   Set Ansi_Warnings      On
+   Set Ansi_Padding       On
+
+   Select @PnEstatus    = 0,
+          @PsMensaje    = Null,
+          @w_operacion  = 9999,
+          @w_comilla    = Char(39)
+
+   Set @w_sql = 'Declare '                                    +
+                    'C_tablas Cursor Fast_Forward For '       +
+                    'Select Name, id '                        +
+                    'From   sysobjects a '                    +
+                    'Where  Uid        = 1 '                  +
+                    'And    Type       = ' + @w_comilla + 'U' + @w_comilla
+
+   If @PsTabla Is Not Null
+      Begin
+         Set @w_sql = @w_sql + ' And    Name = ' + @w_comilla + @PsTabla + @w_comilla
+
+      End
+
+   Set @w_sql = @w_sql + ' Order by 1'
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_error,
+                @PsMensaje = 'Error.: ' + dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Begin Try
+      Create Table #TempDimTablas
+     (Filas          Integer         Null ,
+      Reservado      numeric (18, 0) Null ,
+      Usado_Data     numeric (18, 0) Null ,
+      Usado_Index    numeric (18, 0) Null ,
+      Sin_Uso        numeric (18, 0) Null)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_error,
+                @PsMensaje = 'Error.: ' + dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Begin Try
+      Create Table #TempDimensionamientoTablas
+     (Tabla          Sysname         Not Null,
+      Filas          Integer             Null ,
+      Reservado      numeric (18, 0)     Null ,
+      Usado_Data     numeric (18, 0)     Null ,
+      Usado_Index    numeric (18, 0)     Null ,
+      Sin_Uso        numeric (18, 0)     Null)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_error,
+                @PsMensaje = 'Error.: ' + dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Open  C_tablas
+   While @@fetch_Status < 1
+   Begin
+      Fetch C_tablas Into @w_tabla, @w_id
+
+      If @@Fetch_Status <> 0
+         Begin
+            Break
+         End
+
+      Delete #TempDimTablas
+
+      Set @w_pages = 0
+
+      Insert Into #TempDimTablas (Reservado)
+      Select sum(reserved)
+      From   sysindexes
+      Where  indid in (0, 1, 255)
+      And    id     = @w_id
+
+      Select @w_pages = sum(dpages)
+      From   sysindexes
+      Where  indid < 2
+      And    id    = @w_id
+
+      Select @w_pages = @w_pages + isnull(sum(used), 0)
+      From   sysindexes
+      Where  indid = 255
+      And    id    = @w_id
+
+      Update #TempDimTablas
+      Set    Usado_Data = @w_pages
+
+      Update #TempDimTablas
+      Set    Usado_Index = (Select sum(used)
+                            From   sysindexes
+                            Where  indid in (0, 1, 255)
+                            And    id     = @w_id) -  a.Usado_data
+      From   #TempDimTablas a
+
+      Update #TempDimTablas
+      Set    Sin_uso = a.reservado - (Select sum(used)
+                                     From   sysindexes
+                                     Where  indid in (0, 1, 255)
+                                     And    id     = @w_id)
+      From   #TempDimTablas a
+
+      Update #TempDimTablas
+      Set    Filas = i.rows
+      From   sysindexes i
+      Where  i.indid < 2
+      And    i.id    = @w_id
+
+      Insert Into #TempDimensionamientoTablas
+      Select object_name(@w_id),
+             Filas,
+             reservado   * d.low   / 1024,
+             Usado_Data  * d.low   / 1024,
+             Usado_Index * d.low   / 1024,
+             Sin_uso     * d.low   / 1024
+      From   #TempDimTablas, master.dbo.spt_values d
+      Where  d.number = 1
+      And    d.Type   = 'E'
+
+
+
+   End
+   Close      C_tablas
+   Deallocate C_tablas
+
+   Select *
+   From   #TempDimensionamientoTablas
+   Where  Filas >= Isnull(@PnFilas, 0)
+   Order  by 2 desc
+
+   Begin Try
+      Drop Table #TempDimTablas
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_error,
+                @PsMensaje = 'Error.: ' + dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Begin Try
+      Drop Table #TempDimensionamientoTablas
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_error,
+                @PsMensaje = 'Error.: ' + dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 
+
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que Presenta los datos de tablas de una BD específica.',
+   @w_procedimiento  NVarchar(250) = 'Spc_lista_dim_tablas';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> -- /*
+-- Declare
+   -- @PsProc       Varchar( 60) = 'Gener',
+   -- @PnEstatus    Integer      = 0,
+   -- @PsMensaje    Varchar(250) = ' ';
+-- Begin
+   -- Execute dbo.spc_Lista_Det_Procedimientos @PsProc    = @PsProc,
+                                            -- @PnEstatus = @PnEstatus Output,
+                                            -- @PsMensaje = @PsMensaje Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje;
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+-- */
+
+Create Or Alter Procedure dbo.spc_Lista_Det_Procedimientos
+  (@PsProc       Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0    Output,
+   @PsMensaje    Varchar(250) = ' '  Output)
+As
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+
+   create table #Tempsps(
+    objeto_id              Integer,
+    Procedimiento          Varchar(150),
+    Posicion               Smallint,
+    TipoParametro          Varchar( 10),
+    NombreParametro        Varchar(100),
+    TipoDato               Varchar( 30),
+    Longitud               Integer,
+    Precision              Integer,
+    Escala                 Integer,
+    Collation              Varchar(150),
+    FechaCreacion          Varchar( 10),
+    FechaAct               Varchar( 10));
+
+    Insert into #Tempsps
+    Select S.object_id,             P.SPECIFIC_NAME,
+           P.ordinal_position,      P.PARAMETER_MODE,  P.PARAMETER_NAME,  P.DATA_TYPE,         P.CHARACTER_MAXIMUM_LENGTH,
+           P.NUMERIC_PRECISION,     P.NUMERIC_SCALE,   P.COLLATION_NAME,
+           Convert(Varchar(10),     R.CREATED,      121),
+           Convert(Varchar(10),     R.LAST_ALTERED, 121)
+    From   Information_schema.Parameters P
+    Join   Information_schema.Routines R
+    On     R.specific_name = P.specific_name
+    Join   sys.objects S
+    On     S.name = R.SPECIFIC_NAME
+    Where  R.ROUTINE_TYPE = 'PROCEDURE'
+    Order By P.SPECIFIC_NAME, P.ORDINAL_POSITION;
+
+    If @PsProc Is Not Null
+       Begin
+          Delete #Tempsps
+          Where  Procedimiento Not Like Concat('%', @PsProc, '%');
+       End
+
+    Update #Tempsps
+    Set    Procedimiento     = Char(32),
+           FechaCreacion     = Char(32),
+           FechaAct          = Char(32)
+    Where  Posicion  > 1;
+
+    Update #Tempsps
+    Set    Longitud     = Isnull(Longitud,  Char(32)),
+           Precision    = Isnull(Precision, Char(32)),
+           Escala       = Isnull(Escala,    Char(32)),
+           Collation    = Isnull(Collation, Char(32));
+
+
+    Select Procedimiento,  Posicion,           TipoParametro "Tipo Parametro",
+           NombreParametro "Nombre Parametro", TipoDato      "Tipo Dato",
+           Longitud,       Precision           "Precision Numerica",  Escala,     Collation,
+           FechaCreacion "Fecha Creacion",   FechaAct "Fecha Últ Act"
+    From   #Tempsps
+    Order By objeto_id, Posicion;
+
+    Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que Lista los procedimientos compilados una BD específica.',
+   @w_procedimiento  NVarchar(250) = 'spc_Lista_Det_Procedimientos';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> -- /*
+-- Declare
+   -- @PsProc       Varchar( 60) = Null,
+   -- @PnEstatus    Integer      = 0,
+   -- @PsMensaje    Varchar(250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_Lista_Param_Procedimientos @PsProc    = @PsProc ,
+                                              -- @PnEstatus = @PnEstatus Output,
+                                              -- @PsMensaje = @PsMensaje Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje;
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+-- */
+
+Create Or ALter Procedure dbo.Spc_Lista_Param_Procedimientos
+  (@PsProc       Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0    Output,
+   @PsMensaje    Varchar(250) = ' '  Output)
+-- With Encryption
+As
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+
+   Create Table #tempSps(
+    Id                   Integer Identity(1,1) Primary Key,
+    Procedimiento        Varchar(150),
+    Parametro_Orden      Smallint,
+    Nombre_Parametro     Varchar(100),
+    Tipo_Dato            Varchar(30),
+    Longitud_Caracter    Integer,
+    Precision_Numerica   Integer,
+    Escala               Integer,
+    Collation            Varchar(150),
+    Set_Caracteres       Varchar(50),
+    Tipo_Parametro       Varchar(10));
+
+   Insert Into #tempSps
+       (Procedimiento,            Parametro_Orden,        Nombre_Parametro,
+        Tipo_Dato,   Longitud_Caracter,    Precision_Numerica,     Escala,
+        Collation,   Set_Caracteres,       Tipo_Parametro)
+   Select a.name,              b.ordinal_position,    b.parameter_name,
+          b.data_type,         b.character_maximum_length,   b.numeric_precision,   b.numeric_scale,
+          b.collation_name,    b.character_set_name,         b.parameter_modE
+   From  sys.procedures a
+   Join  INFORMATION_SCHEMA.PARAMETERS b
+   On    b.specific_name = a.name
+   Where a.type      = 'P'
+--    And   a.name not in ('sp_alterdiagram','sp_creatediagram','sp_dropdiagram','sp_helpdiagramdefinition','sp_helpdiagrams','sp_renamediagram','sp_upgraddiagrams')
+   Order by a.name, b.ORDINAL_POSITION
+
+   If @PsProc  Is Not Null
+      Begin
+         Delete #Tempsps
+         Where  Procedimiento Not Like Concat('%', @PsProc , '%');
+      End
+
+   Update #tempSps
+   Set    Procedimiento = ''
+   Where  Parametro_Orden > 1
+
+   Select Procedimiento,               Parametro_Orden,
+          Nombre_Parametro,                                                       Tipo_Dato,
+          Case When IsNull(Cast(Longitud_Caracter As Varchar),'') = '-1'
+               Then 'Max'
+               Else IsNull(Cast(Longitud_Caracter As Varchar),'')
+          End As Longitud_Caracter,
+          IsNull(Cast(Precision_Numerica As Varchar),'') Precision_Numerica,
+          IsNull(Cast(Escala As Varchar),'') Escala,
+          IsNull(Cast(Collation As Varchar),'')          Collation,
+          IsNull(Cast( Set_Caracteres As Varchar),'')    Set_Caracteres,          Tipo_Parametro
+   From #tempSps;
+
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que consulta los Parametros de los Procedimientos de una BD.',
+   @w_procedimiento  NVarchar(250) = 'Spc_Lista_Param_Procedimientos';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> -- /*
+-- Declare
+   -- @PsFuncion    Varchar( 60) = Null,
+   -- @PnEstatus    Integer      = 0,
+   -- @PsMensaje    Varchar(250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_Lista_Det_Funciones @PsFuncion = @PsFuncion ,
+                                       -- @PnEstatus = @PnEstatus Output,
+                                       -- @PsMensaje = @PsMensaje Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje;
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+-- */
+
+Create Or Alter Procedure dbo.Spc_Lista_Det_Funciones
+  (@PsFuncion    Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0    Output,
+   @PsMensaje    Varchar(250) = ' '  Output)
+-- With Encryption
+As
+   Declare 
+   @w_Error             Integer,
+   @w_desc_error        Varchar( 250) 
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Begin Try
+
+     Select SCHEMA_NAME(so.SCHEMA_ID) AS Esquema,
+     so.name AS [Nombre Función], 
+     so.type As [Tipo Función],
+     so.Type_Desc AS [Descripción Tipo Función],
+     p.parameter_id AS [Id Parametro],
+     p.name AS [Nombre Parametro],
+     TYPE_NAME(p.user_type_id) AS [Tipo de Dato]
+     , Case When p.system_type_id Not In(34, 35, 58, 61, 189) Then 
+               Case When p.max_length > 0 And p.precision = 0 Then Cast(p.max_length As Varchar)
+     		       When p.max_length < 0 And p.precision = 0 Then 'Max'
+     		       When p.precision  > 0 And p.scale = 0 Then Cast(p.precision As Varchar) 
+     			   When p.precision  > 0 And p.scale > 0 Then Cast(p.precision As Varchar) + ', ' + Cast(p.scale As Varchar)  
+     		  End
+     	   Else Cast(p.max_length As Varchar)
+           End As [Longitud] 
+     , Case When p.is_output = 1 Then 'OUT' Else 'IN' End As [Tipo Parametro] 
+     From sys.objects    As so
+     Join sys.parameters As p  On so.OBJECT_ID = p.OBJECT_ID
+     Join sys.types      As st On st.system_type_id = p.system_type_id  And p.user_type_id = st.user_type_id 
+     Where 1=1 
+	 And so.TYPE IN ('FN','TF','IF')
+     And so.name   like Iif(@PsFuncion  Is Null, so.name,  '%' + @PsFuncion + '%') 
+	 Order By [Esquema], so.name, p.parameter_id
+	 
+
+    End Try
+	
+	Begin Catch
+       Select  @w_Error      = @@Error,
+               @w_desc_error = Substring (Error_Message(), 1, 230)
+    End   Catch
+
+    If Isnull(@w_Error, 0) <> 0
+       Begin
+          Select @PnEstatus = @w_Error,
+                 @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+          Select @PsMensaje
+
+          Set Xact_Abort Off
+          Return
+       End
+
+
+    Set Xact_Abort Off
+    Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que lista las funciones de una BD.',
+   @w_procedimiento  NVarchar(250) = 'Spc_Lista_Det_Funciones';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> -- /*
+-- Declare
+   -- @PsTabla      Varchar( 60) = 'catGeneralesTbl',
+   -- @PnEstatus    Integer      = 0,
+   -- @PsMensaje    Varchar(250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_Lista_Det_Triggers @PsTabla   = @PsTabla ,
+                                      -- @PnEstatus = @PnEstatus Output,
+                                      -- @PsMensaje = @PsMensaje Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje;
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+-- */
+
+Create Or Alter Procedure dbo.Spc_Lista_Det_Triggers
+  (@PsTabla      Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0    Output,
+   @PsMensaje    Varchar(250) = ' '  Output)
+As
+Declare
+   @w_Error             Integer,
+   @w_desc_error        Varchar( 250)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Begin Try
+
+     Select
+         db_name() [Base de Datos]
+         , OBJECT_NAME(so.parent_obj) AS [Nombre Tabla]
+         , so.name AS [Nombre Trigger]
+         , USER_NAME(so.uid) AS [Propietario]
+         , s.name AS [Esquema]
+     	 , Case When OBJECTPROPERTY(id, 'ExecIsTriggerDisabled')  = 0 Then 'Si' Else 'No' End As [Habilitado]
+         , Case When OBJECTPROPERTY(id, 'ExecIsInsteadOfTrigger') = 1 Then 'Si' Else 'No' End As [InsteadOf]
+         , Case When OBJECTPROPERTY(id, 'ExecIsAfterTrigger')     = 1 Then 'Si' Else 'No' End As [After]
+     	 , Case When OBJECTPROPERTY(id, 'ExecIsInsertTrigger')    = 1 Then 'Si' Else 'No' End As [Insert]
+         , Case When OBJECTPROPERTY(id, 'ExecIsUpdateTrigger')    = 1 Then 'Si' Else 'No' End As [Update]
+         , Case When OBJECTPROPERTY(id, 'ExecIsDeleteTrigger')    = 1 Then 'Si' Else 'No' End As [Delete]
+     From  sysobjects  so
+     Join  sysusers      On so.uid        = sysusers.uid
+     Join  sys.tables  t On so.parent_obj = t.object_id
+     Join  sys.schemas s On t.schema_id   = s.schema_id
+     WHERE 1=1
+	 And so.type = 'TR'
+	 And OBJECT_NAME(so.parent_obj)  = Iif(@PsTabla  Is Null, OBJECT_NAME(so.parent_obj),  @PsTabla)
+
+    End Try
+
+	Begin Catch
+       Select  @w_Error      = @@Error,
+               @w_desc_error = Substring (Error_Message(), 1, 230)
+    End   Catch
+
+    If Isnull(@w_Error, 0) <> 0
+       Begin
+          Select @PnEstatus = @w_Error,
+                 @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+          Select @PsMensaje
+
+          Set Xact_Abort Off
+          Return
+       End
+
+    Set Xact_Abort Off
+    Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que lista lod disparadores de una BD.',
+   @w_procedimiento  NVarchar(250) = 'Spc_Lista_Det_Triggers';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> -- /*
+-- Declare
+   -- @PsVista      Varchar( 60) = Null,
+   -- @PnEstatus    Integer      = 0,
+   -- @PsMensaje    Varchar(250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_Lista_Det_Vistas @PsVista   = @PsVista,
+                                    -- @PnEstatus = @PnEstatus Output,
+                                    -- @PsMensaje = @PsMensaje Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje;
+      -- End
+
+   -- Return
+
+-- End
+-- Go
+-- */
+
+Create Or Alter Procedure Spc_Lista_Det_Vistas
+  (@PsVista      Varchar( 60) = Null,
+   @PnEstatus    Integer      = 0    Output,
+   @PsMensaje    Varchar(250) = ' '  Output)
+-- With Encryption
+As
+
+Declare
+  C_tablas Cursor For
+  Select   Name, id
+  from     Sysobjects 
+  Where    Uid     = 1
+  And      Type    = 'V'
+  And      Name    = Case When @PsVista Is Null
+                          Then Name
+                     Else @PsVista
+                 End
+  Order    By 1
+
+Declare
+   @w_tabla             Sysname,
+   @w_columna           Sysname,
+   @w_idTabla           Integer,
+   @w_column_id         Integer,
+   @w_TipoCampo         Varchar(250),
+   @w_Longitud          Integer,
+   @w_Decimales         Integer,
+   @w_requerido         Char(2),
+   @w_aplica            Bit,
+   @w_desc_error        Varchar( 250),
+   @w_Error             Integer,
+   @w_descripcion       NVarchar(1500),
+   @w_dependencias      NVarchar(1500) 
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Create table #Tmp_Objectos
+   (Orden             SmallInt        Not Null,
+    BaseDatos         Sysname         Default ' ',
+    Objeto            Sysname         Default ' ', 
+    Tabla             Sysname         Default ' ',
+    idcolumna         Integer         Null,
+    Columna           Sysname         Default ' ',
+    Tipo              Varchar(  250)  Default ' ',
+    Longitud          Varchar   (20)  Default ' ',
+    Decimales         Varchar(   20)  Default ' ',
+    Descripcion       NVarchar(1500)  Default ' ',
+	Dependencias      NVarchar(1500)  Default ' ')
+
+   Insert Into #Tmp_Objectos
+   (Orden, BaseDatos, Descripcion)
+   Select 0, db_Name(), (Select Cast(Value As NVarchar(1550))
+   From   fn_listextendedproperty('MS_Description', Null, Null, Null, Null, 
+              Null, Null))
+
+   Open  C_tablas
+   While @@Fetch_status < 1
+   Begin
+      Fetch C_tablas Into @w_tabla, @w_idTabla
+      If @@Fetch_status <> 0
+         Begin
+            Break
+         End
+
+      Set @w_descripcion = ''
+
+      Select @w_descripcion = Cast(Value As NVarchar(1550))
+      From   fn_listextendedproperty('MS_Description', 'Schema', 'dbo', 'table', @w_tabla, 
+              Null, Null)
+
+      Select @w_dependencias = Stuff
+      (
+       (
+        Select ', ' + 
+        Iif(t.referenced_server_name Is Null,'',  t.referenced_server_name+'.')   + 
+        Iif(t.referenced_database_name Is Null,'',t.referenced_database_name+'.') +
+        Iif(t.referenced_schema_name Is Null,'',  t.referenced_schema_name+'.')   + 
+        t.referenced_entity_name 
+        From sys.sql_expression_dependencies As t
+        Where t.referencing_id = @w_idTabla
+        For XML Path (''), Type
+       ).value('.', 'varchar(max)'), 1, 1, '')
+
+      Insert Into #Tmp_Objectos
+      (Orden, Objeto, tabla, Descripcion, Dependencias)
+      Values (1, @w_tabla, @w_tabla, @w_descripcion, @w_dependencias)
+      
+      Declare
+         C_columnas Cursor For
+           Select Name, Column_id
+           From   sys.columns 
+           Where  Object_id = @w_idTabla
+           Order  By Column_id
+           
+      Begin
+         Open   C_columnas
+         While  @@Fetch_Status < 1
+         Begin
+            Fetch C_columnas Into @w_columna, @w_column_id
+            If @@Fetch_status <> 0
+               Begin 
+                  Break
+               End
+
+            Set @w_descripcion = ' '
+
+            Select @w_descripcion = Cast(Value As NVarchar(1550))
+            From   fn_listextendedproperty('MS_Description', 'Schema', 'dbo', 'table', @w_tabla, 
+                    'Column', @w_columna)
+            
+            Execute Spc_valida_longitud @w_Tabla,     @w_Columna,   
+                                        @w_Aplica     Output,
+										@w_TipoCampo  Output,
+										@w_Longitud   Output,
+                                        @w_Decimales  Output,     
+									    @w_requerido  Output, 
+									    @PnEstatus    Output,
+                                        @PsMensaje    Output 
+  
+            If @PnEstatus = 0
+               Begin
+                  Begin Try
+                     Insert Into #Tmp_Objectos
+                    (Orden,             Objeto,      idcolumna,  Columna,      Tipo,       Longitud,  Decimales, Descripcion)
+                     Select  2, @w_tabla, @w_column_id, @w_columna, @w_TipoCampo,
+                            Cast(@w_longitud As Varchar(20)), 
+                            Case When @w_decimales = 0
+                                 Then ' '
+                                 Else Cast(@w_decimales As Varchar)
+                            End,
+							@w_descripcion  
+                  End Try
+
+                  Begin Catch
+                     Select  @w_Error      = @@Error,
+                             @w_desc_error = Substring (Error_Message(), 1, 230)
+                  End   Catch
+
+                  If Isnull(@w_Error, 0) <> 0
+                     Begin
+                        Select @PnEstatus = @w_Error,
+                               @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+                        Select @PsMensaje
+
+                        Set Xact_Abort Off
+                        Return
+                     End
+               End
+            Else
+               Begin
+                  Select @PnEstatus, @PsMensaje
+               End
+         End
+         Close      C_columnas
+         Deallocate C_columnas
+      End
+      
+   End
+   Close      C_tablas
+   Deallocate C_tablas
+   
+   Select Tabla "Vista", Columna, tipo "Tipo de Dato", Case When longitud = -1 
+                                                            Then 'Max'
+                                                            Else longitud
+                                                        End +
+                                                           Case When Decimales != ' '
+                                                           Then ', ' + Decimales
+                                                           Else ' '
+                                                       End Longitud,
+		  Descripcion "Descripción", Dependencias 
+   From   #Tmp_Objectos
+   Order By Objeto, idcolumna
+   
+   Return
+   
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento que Lista el detalle de las vistas.',
+   @w_procedimiento  NVarchar(250) = 'Spc_Lista_Det_Vistas';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> Create Or Alter Procedure dbo.Spc_catPaisesTbl  
+   (@PnIdPais                  Smallint       =    Null,
+    @PsNombre                  Varchar(  60)  =    Null,
+    @PsAbreviatura             Varchar(   3)  =    Null,
+    @PsNacionalidad            Varchar(  60)  =    Null,
+    @PnEstatus                 Integer        = 0   Output,
+    @PsMensaje                 Varchar( 250)  = ' ' Output)  
+  
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+   
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select idPais,       nombre Pais, abreviatura,
+                        nacionalidad, codigoSat
+                 From   dbo.catPaisesTbl '
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PsNombre Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' nombre Like ' + @w_comilla + '%' + @PsNombre + '%' + @w_comilla
+      End
+
+   If @PsAbreviatura Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' abreviatura Like ' + @w_comilla + '%' + @PsAbreviatura + '%' + @w_comilla
+      End
+
+   If @PsNacionalidad Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' nacionalidad Like ' + @w_comilla + '%' + @PsNacionalidad + '%' + @w_comilla
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+
+
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catPaisesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catPaisesTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> Create Or Alter Procedure dbo.Spc_catEstadosTbl
+   (@PnIdPais                  Smallint       =    1,
+    @PnIdEstado                Smallint       =    Null,
+    @PsNombre                  Varchar(  60)  =    Null,
+    @PsAbreviatura             Varchar(   3)  =    Null,
+    @PsClaveSat                Varchar(   3)  =    Null,
+    @PnEstatus                 Integer       = 0   Output,
+    @PsMensaje                 Varchar( 250) = ' ' Output)  
+  
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+   
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.idPais,      b.nombre nombrePais, a.idEstado, a.nombre nombreEstado, ' +
+                       'a.abreviatura, a.claveSAT ' +
+                'From   dbo.catEstadosTbl a '       +
+                'Join   dbo.catPaisesTbl  b '       +
+                '  On   b.idPais   = a.idPais '
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  a.idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PnIdEstado Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+        Set @w_sql = @w_sql + ' a.idEstado = ' + Cast(@PnIdEstado As Varchar)
+      End
+
+   If @PsNombre Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.nombre Like ' + @w_comilla + '%' + @PsNombre + '%' + @w_comilla
+      End
+
+   If @PsAbreviatura Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.abreviatura Like ' + @w_comilla + '%' + @PsAbreviatura + '%' + @w_comilla
+      End
+
+   If @PsClaveSAT Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.claveSAT Like ' + @w_comilla + '%' + @PsClaveSAT + '%' + @w_comilla
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catEstadosTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catEstadosTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> Create Or Alter Procedure dbo.Spc_catMunicipiosTbl
+   (@PnIdPais                  Smallint       =    Null,
+    @PnIdEstado                Smallint       =    Null,
+    @PnIdMunicipio             Smallint       =    Null,
+    @PsNombre                  Varchar(  60)  =    Null,
+    @PsAbreviatura             Varchar(   3)  =    Null,
+    @PnEstatus                 Integer       = 0   Output,
+    @PsMensaje                 Varchar( 250) = ' ' Output)  
+  
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+   
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.idPais,   a.idEstado,     ' +
+                       'a.idMunicipio, a.nombre nombreMunicipio, a.abreviatura ' +
+                'From   dbo.catMunicipiosTbl a '      +
+                'Join   dbo.catPaisesTbl  b '         +
+                '  On   b.idPais   = a.idPais '       +
+                'Join   dbo.catEstadosTbl c '         +
+                '  On   c.idPais   = a.idPais '       +
+                'And    c.idEstado = a.idEstado '
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  a.idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PnIdEstado Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstado = ' + Cast(@PnIdEstado As Varchar)
+      End
+
+
+   If @PnIdMunicipio Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idMunicipio = ' + Cast(@PnIdMunicipio As Varchar)
+      End
+
+
+   If @PsNombre Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.nombre Like ' + @w_comilla + '%' + @PsNombre + '%' + @w_comilla
+      End
+
+   If @PsAbreviatura Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.abreviatura Like ' + @w_comilla + '%' + @PsAbreviatura + '%' + @w_comilla
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catMunicipiosTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catMunicipiosTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> Create Or Alter Procedure dbo.Spc_catColoniasTbl
+   (@PnIdPais                  Smallint       =    Null,
+    @PnIdEstado                Smallint       =    Null,
+    @PnIdCiudad                Smallint       =    Null,
+    @PnIdMunicipio             Smallint       =    Null,
+    @PnIdColonia               Smallint       =    Null,
+    @PsNombre                  Varchar(  60)  =    Null,
+    @PsAbreviatura             Varchar(   3)  =    Null,
+    @PsIdCodigoPostal          Varchar(  10)  =    Null,
+    @PnEstatus                 Integer       = 0   Output,
+    @PsMensaje                 Varchar( 250) = ' ' Output)
+
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.idPais,    a.idEstado, Isnull(a.idCiudad, 0) idCiudad,    a.idMunicipio, ' +
+                       'a.idColonia, a.nombre    nombreColonia, a.abreviatura '                      +
+                'From   dbo.catColoniasTbl a '          +
+                'Join   dbo.catPaisesTbl   b '          +
+                'On     b.idPais      = a.idPais '      +
+                'Join   dbo.catEstadosTbl c '           +
+                'On     c.idPais      = a.idPais '      +
+                'And    c.idEstado    = a.idEstado '    +
+                'Left   Join   dbo.catCiudadesTbl d '   +
+                'On     d.idPais      = a.idPais '      +
+                'And    d.idEstado    = a.idEstado '    +
+                'And    d.idCiudad    = a.idCiudad '    +
+                'Join   dbo.catMunicipiosTbl e '        +
+                'On     e.idPais      = a.idPais '      +
+                'And    e.idEstado    = a.idEstado '    +
+                'And    e.idMunicipio = a.idMunicipio'
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  a.idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PnIdEstado Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstado = ' + Cast(@PnIdEstado As Varchar)
+      End
+
+   If @PnIdCiudad Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idCiudad = ' + Cast(@PnIdCiudad As Varchar)
+      End
+
+   If @PnIdMunicipio Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idMunicipio = ' + Cast(@PnIdMunicipio As Varchar)
+      End
+
+   If @PnIdColonia Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idColonia = ' + Cast(@PnIdColonia As Varchar)
+      End
+
+   If @PsNombre Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.nombre Like ' + @w_comilla + '%' + @PsNombre + '%' + @w_comilla
+      End
+
+   If @PsAbreviatura Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.abreviatura Like ' + @w_comilla + '%' + @PsAbreviatura + '%' + @w_comilla
+      End
+
+   If @PsIdCodigoPostal Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.IdCodigoPostal Like ' + @w_comilla + '%' + @PsIdCodigoPostal + '%' + @w_comilla
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catColoniasTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catColoniasTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> Create Or Alter Procedure dbo.Spc_catCiudadesTbl
+   (@PnIdPais                  Smallint       =    Null,
+    @PnIdEstado                Smallint       =    Null,
+    @PnIdCiudad                Smallint       =    Null,
+    @PsNombre                  Varchar(  60)  =    Null,
+    @PsAbreviatura             Varchar(   3)  =    Null,
+    @PnEstatus                 Integer       = 0   Output,
+    @PsMensaje                 Varchar( 250) = ' ' Output)
+
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.idPais,     a.idEstado, a.idCiudad, a.nombre '   +
+                       'NombreCiudad, a.abreviatura ' +
+                'From   dbo.catCiudadesTbl a '       +
+                'Join   dbo.catPaisesTbl  b '        +
+                '  On   b.idPais   = a.idPais '      +
+                'Join   dbo.catEstadosTbl c '        +
+                '  On   c.idPais   = a.idPais '      +
+                'And    c.idEstado = a.idEstado '
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  a.idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PnIdEstado Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstado = ' + Cast(@PnIdEstado As Varchar)
+      End
+
+   If @PnIdCiudad Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idCiudad = ' + Cast(@PnIdCiudad As Varchar)
+      End
+
+   If @PsNombre Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.nombre Like ' + @w_comilla + '%' + @PsNombre + '%' + @w_comilla
+      End
+
+   If @PsAbreviatura Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where  '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.abreviatura Like ' + @w_comilla + '%' + @PsAbreviatura + '%' + @w_comilla
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catCiudadesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catCiudadesTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> Create Or Alter Procedure dbo.Spc_catCodigosPostalesTbl  
+   (@PnIdPais                  Smallint      = Null,
+    @PnIdEstado                Smallint      = Null,
+    @PnIdCiudad                Smallint      = Null,
+    @PnIdMunicipio             Smallint      = Null,
+    @PnIdColonia               Smallint      = Null,
+    @PsIdCodigoPostal          Varchar(  10) = Null,
+    @PnEstatus                 Integer       = 0   Output,
+    @PsMensaje                 Varchar( 250) = ' ' Output)  
+  
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+   
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 1,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.idPais,             b.nombre Pais,        a.idEstado,      c.nombre Estado, '  +
+                       'Isnull(a.idCiudad, 0) idCiudad,             d.nombre Ciudad, a.idMunicipio, '    +
+                       'e.nombre Municipio,   a.idCodigoPostal CP,  a.idColonia,     cl.nombre Colonia ' +
+                'From   dbo.catCodigosPostalesTbl a '     +
+                'Join   dbo.catPaisesTbl  b '             +
+                'On     b.idPais       = a.idPais '       +
+                'Join   dbo.catEstadosTbl c '             +
+                'On     c.idPais       = a.idPais '       +
+                'And    c.idEstado     = a.idEstado '     +
+                'Left Join   dbo.catCiudadesTbl d '       +
+                'On     d.idPais       = a.idPais '       +
+                'And    d.idEstado     = a.idEstado '     +
+                'And    d.idCiudad     = a.idCiudad '     +
+                'Join   dbo.catMunicipiosTbl e '          +
+                'On     e.idPais       = a.idPais '       +
+                'And    e.idEstado     = a.idEstado '     +
+                'And    e.idMunicipio  = a.idMunicipio '  +
+                'Join   dbo.catColoniasTbl cl '           +
+                'On     cl.idPais      = a.idPais '       +
+                'And    cl.idEstado    = a.idEstado '     +
+                'And    cl.idMunicipio = a.idMunicipio '  +
+                'And    cl.idColonia   = a.idColonia '
+
+   If @PnIdPais Is Not Null
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where  a.idPais = ' + Cast(@PnIdPais As Varchar)
+      End
+
+   If @PnIdEstado Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstado = ' + Cast(@PnIdEstado As Varchar)
+      End
+
+   If @PnIdCiudad Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idCiudad = ' + Cast(@PnIdCiudad As Varchar)
+      End
+
+   If @PnIdMunicipio Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idMunicipio = ' + Cast(@PnIdMunicipio As Varchar)
+      End
+
+   If @PnIdColonia Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idColonia = ' + Cast(@PnIdColonia As Varchar)
+      End
+
+   If @PsIdCodigoPostal Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idCodigoPostal Like ' + @w_comilla + '%' + @PsIdCodigoPostal + '%' + @w_comilla 
+      End
+
+   Begin Try
+         Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta en la entidad catCodigosPostalesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catCodigosPostalesTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> -- /*
+-- Declare
+    -- @PsCriterio          Char   (  25) = Null,
+    -- @PnValor             Smallint      = Null,
+    -- @PsDescripcion       Varchar(  60) = Null,
+    -- @PsValorAdicional    Varchar(  20) = Null,
+    -- @PbIdEstatus         Bit           = Null,
+    -- @PnEstatus           Integer       = 0,
+    -- @PsMensaje           Varchar( 250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_catCriteriosTbl @PsCriterio      = @PsCriterio,
+                                   -- @PnValor         = @PnValor,
+                                   -- @PsDescripcion   = @PsDescripcion,
+                                   -- @PsValorAdicional= @PsValorAdicional,
+                                   -- @PbIdEstatus     = @PbIdEstatus,
+                                   -- @PnEstatus       = @PnEstatus  Output,
+                                   -- @PsMensaje       = @PsMensaje  Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje
+      -- End;
+
+   -- Return
+-- End
+-- Go
+
+
+-- */
+
+Create Or Alter Procedure dbo.Spc_catCriteriosTbl
+   (@PsCriterio          Char   (  25) = Null,
+    @PnValor             Smallint      = Null,
+    @PsDescripcion       Varchar(  60) = Null,
+    @PsValorAdicional    Varchar(  20) = Null,
+    @PbIdEstatus         Bit           = Null,
+    @PnEstatus           Integer       = 0   Output,
+    @PsMensaje           Varchar( 250) = ' ' Output)
+
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1),
+    @w_registros         Integer
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.criterio,                          a.valor,                 a.descripcion,   a.valorAdicional, ' +
+                       'a.idEstatus, '                                                                                     +
+                       'Case When a.idestatus = 1
+                             Then ' + @w_comilla + 'Activo'   + @w_comilla + ' ' +
+                            'Else ' + @w_comilla + 'INACTIVO' + @w_comilla + ' ' +
+                       'End estatus, '                                                                            +
+                       'a.fechaAct,                         a.ipAct,                  a.macAddressAct '                    +
+                'From   catCriteriosTbl a '
+
+   If Isnull(Rtrim(Ltrim(@PsCriterio)), ' ') != ' '
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' criterio Like ' + @w_comilla + '%' + Rtrim(Ltrim(@PsCriterio)) + '%' + @w_comilla
+
+      End
+
+   If Isnull(@PnValor, -1) != -1
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' valor = ' + Cast(@PnValor As Varchar)
+
+      End
+
+   If Isnull(Rtrim(Ltrim(@PsDescripcion)), ' ') != ' '
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.descripcion like ' + @w_comilla + '%' + @PsDescripcion + '%' + @w_comilla
+      End
+
+   If @PsValorAdicional Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.valorAdicional Like ' + @w_comilla + '%' + @PsValorAdicional + '%' + @w_comilla
+
+      End
+
+   If @PbIdEstatus Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstatus = ' + @w_comilla + Cast(@PbIdEstatus As Varchar) + @w_comilla
+
+      End
+
+   Set @w_sql = @w_sql + ' Order By a.descripcion'
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta a la entidad catCriteriosTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catCriteriosTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> -- /*
+-- Declare
+    -- @PsTabla             Sysname       = Null,
+    -- @PsColumna           Sysname       = Null,
+    -- @PnValor             Integer       = Null,
+    -- @PsDescripcion       Varchar( 100) = Null,
+    -- @PbIdEstatus         Bit           = Null,
+    -- @PnEstatus           Integer       = 0,
+    -- @PsMensaje           Varchar( 250) = ' ';
+-- Begin
+   -- Execute dbo.Spc_catGeneralesTbl @PsTabla         = @PsTabla,
+                                   -- @PsColumna       = @PsColumna,
+                                   -- @PnValor         = @PnValor,
+                                   -- @PsDescripcion   = @PsDescripcion,
+                                   -- @PbIdEstatus     = @PbIdEstatus,
+                                   -- @PnEstatus       = @PnEstatus  Output,
+                                   -- @PsMensaje       = @PsMensaje  Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje
+      -- End;
+
+   -- Return
+-- End
+-- Go
+
+
+-- */
+
+Create Or Alter Procedure dbo.Spc_catGeneralesTbl
+   (@PsTabla           Sysname       = Null,
+    @PsColumna         Sysname       = Null,
+    @PnValor           Integer       = Null,
+    @PsDescripcion     Varchar( 100) = Null,
+    @PbIdEstatus       Bit           = Null,
+    @PnEstatus         Integer       = 0   Output,
+    @PsMensaje         Varchar( 250) = ' ' Output)
+
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_primero           Bit,
+    @w_comilla           Char(1)
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+   Set Ansi_Warnings On
+   Set Ansi_Padding  On
+
+   Select @PnEstatus  = 0,
+          @PsMensaje  = Null,
+          @w_primero  = 0,
+          @w_comilla  = Char(39)
+
+   Set @w_sql = 'Select a.tabla,        a.columna,  a.valor,  a.descripcion, a.idEstatus, '              +
+                       'Case When a.idestatus = 1
+                             Then ' + @w_comilla + 'Activo'   + @w_comilla + ' ' +
+                            'Else ' + @w_comilla + 'INACTIVO' + @w_comilla + ' ' +
+                       'End estatus '                                            +
+                'From  dbo.catGeneralesTbl a '
+
+   If Isnull(Rtrim(Ltrim(@PsTabla)), ' ') != ' '
+      Begin
+         Select @w_primero = 1,
+                @w_sql     = @w_sql + ' Where Tabla Like ' + @w_comilla + '%' + @PsTabla + '%' + @w_comilla
+      End
+
+   If Isnull(Rtrim(Ltrim(@PsColumna)), ' ') != ' '
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' Columna Like ' + @w_comilla + '%' + @PsColumna + '%' + @w_comilla
+      End
+
+   If Isnull(@PnValor, -1) != -1
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' Valor = ' + Cast(@PnValor As Varchar)
+      End
+
+   If Isnull(Rtrim(Ltrim(@PsDescripcion)), ' ') != ' '
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' Descripcion Like ' + @w_comilla + '%' + @PsDescripcion + '%' + @w_comilla
+      End
+
+   If @PbIdEstatus Is Not Null
+      Begin
+         If @w_primero = 0
+            Begin
+               Select @w_primero = 1,
+                      @w_sql     = @w_sql + ' Where '
+            End
+         Else
+            Begin
+               Set @w_sql = @w_sql + ' And '
+            End
+
+         Set @w_sql = @w_sql + ' a.idEstatus = ' + Cast(@PbIdEstatus as Varchar)
+      End
+
+   Begin Try
+      Execute (@w_sql)
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Consulta a la entidad catGeneralesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spc_catGeneralesTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> -- /*
+-- Declare
+    -- @PsTabla             Sysname       = Null,
+    -- @PsColumna           Sysname       = Null,
+    -- @PnValor             Integer       = Null,
+    -- @PsDescripcion       Varchar( 100) = Null,
+    -- @PbIdEstatus         Bit           = Null,
+    -- @PnEstatus           Integer       = 0,
+    -- @PsMensaje           Varchar( 250) = ' ';
+-- Begin
+   -- Execute dbo.Spu_catGeneralesTbl @PsTabla         = @PsTabla,
+                                   -- @PsColumna       = @PsColumna,
+                                   -- @PnValor         = @PnValor,
+                                   -- @PsDescripcion   = @PsDescripcion,
+                                   -- @PbIdEstatus     = @PbIdEstatus,
+                                   -- @PnEstatus       = @PnEstatus  Output,
+                                   -- @PsMensaje       = @PsMensaje  Output;
+   -- If @PnEstatus != 0
+      -- Begin
+         -- Select @PnEstatus, @PsMensaje
+      -- End;
+
+   -- Return
+-- End
+-- Go
+
+
+-- */
+
+Create Or Alter Procedure dbo.Spu_catGeneralesTbl
+   (@PsTabla              Sysname,
+    @PsColumna            Sysname,
+    @PnValor              Smallint,
+    @PsDescripcion        Varchar(  60) = Null,
+    @PbIdEstatus          Bit           = Null,
+    @PnEstatus            Integer       = 0   Output,
+    @PsMensaje            Varchar( 250) = ' ' Output)
+
+As
+Declare
+    @w_sql               Varchar(Max),
+    @w_desc_error        Varchar( 250),
+    @w_Error             Integer,
+    @w_operacion         Integer;
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    On
+
+   Select @PnEstatus   = 0,
+          @PsMensaje   = Null,
+          @w_operacion = 9999;
+
+   If Not Exists (Select Top 1 1
+                  From   dbo.catGeneralesTbl
+                  Where  tabla   = @PsTabla
+                  And    columna = @PsColumna
+                  And    valor   = @PnValor)
+      Begin
+         Select @PnEstatus = 1,
+                @PsMensaje = dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus)
+         Set Xact_Abort Off
+         Return
+     End
+
+   Begin Try
+      Update dbo.catGeneralesTbl
+      Set    descripcion   = Isnull(@PsDescripcion, a.descripcion),
+             idEstatus     = Isnull(@PbIdEstatus,   a.idEstatus),
+             fechaAct      = Getdate(),
+             ipAct         = dbo.Fn_BuscaDireccionIP(),
+             macAddressAct = dbo.Fn_Busca_DireccionMAC()
+      From   dbo.catGeneralesTbl a
+      Where  tabla   = @PsTabla
+      And    columna = @PsColumna
+      And    valor   = @PnValor
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_desc_error = Substring (Error_Message(), 1, 230)
+   End   Catch
+
+   If Isnull(@w_Error, 0) <> 0
+      Begin
+         Select @PnEstatus = @w_Error,
+                @PsMensaje = 'Error.: ' + Rtrim(Ltrim(Cast(@w_Error As Varchar))) + ' ' + @w_desc_error
+         Set Xact_Abort Off
+         Return
+      End
+
+   Set Xact_Abort Off
+   Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Procedimiento de Actualización a la entidad catGeneralesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Spu_catGeneralesTbl';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 

@@ -1,0 +1,24 @@
+1> 2> Processed 4136 pages for database 'ServicioPostal', file 'ServicioPostal' on
+file 1.
+declare @PnEstatus Integer = 0, @PsMensaje Varchar(250) Begin Execute dbo.Spp_RecuperaBd     'ServicioPostal', 'C:\Desarrollos\Migracion', 'C:\BaseDatos\DB_Siccorp_DES\',  @PnEstatus Output, @PsMensaje Output; Select @PnEstatus, @PsMensaje End  
+Processed 1 pages for database 'ServicioPostal', file 'ServicioPostal_log' on
+file 1.
+RESTORE DATABASE successfully processed 4137 pages in 0.062 seconds (521.192
+MB/sec).
+             
+	                                                                       
+	                                                                       
+	                                                                       
+	                                      
+ ----------- 
+	-----------------------------------------------------------------------
+	-----------------------------------------------------------------------
+	-----------------------------------------------------------------------
+	------------------------------------- 
+           0 
+	                                                                       
+	                                                                       
+	                                                                       
+	                                      
+
+(1 row affected)

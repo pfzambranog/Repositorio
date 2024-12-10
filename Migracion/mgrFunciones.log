@@ -1,0 +1,1681 @@
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> Create Or Alter Function dbo.Fn_Busca_DireccionMac()
+Returns Char(30)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(30)
+
+   Begin
+      Select @o_salida = net_address
+      From   master.dbo.sysprocesses 
+      Where  spid = @@spid
+
+      Set @o_salida = Isnull(@o_salida, ' ')
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Calcula la DIrección MAC.',
+   @w_procedimiento  NVarchar(250) = 'Fn_Busca_DireccionMac';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> -- /*  
+-- Declare  
+    -- @PnIdFormulario        Integer = 9999,  
+    -- @PnIdError             Sysname = 8161;  
+-- Begin  
+   -- Select dbo.Fn_Busca_MensajeError(@PnIdFormulario, @PnIdError);  
+   -- Return  
+  
+-- End  
+-- Go  
+  
+-- */  
+  
+-- Version:     V1  
+-- Fecha:       27-Jun-2024  
+-- Programador: Pedro Zambrano.  
+-- Objetivo:    Realizar consulta al catálogo de Errores  
+--  
+  
+Create Or Alter Function dbo.Fn_Busca_MensajeError  
+ (@PnIdFormulario    Smallint,  
+  @PnIdError         Smallint)  
+Returns Varchar(250)  
+As  
+  
+Begin  
+   Declare  
+      @o_salida     Varchar( 250)  
+   Begin  
+  
+      Select @o_salida = mensaje  
+      From   dbo.catMensajesErroresTbl With (Nolock)  
+      Where  idFormulario = @PnIdFormulario  
+      And    idError      = @PnIdError  
+      If @@Rowcount = 0  
+         Begin  
+            Set @o_salida = 'Mensaje No Definido'  
+         End  
+  
+   End  
+  
+   Return(@o_salida)  
+  
+End  
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catMensajesErroresTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_Busca_MensajeError';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> Create Or Alter Function Fn_BuscaDescripcionCriterio
+  (@PsCriterio     Char(25),
+   @PnValor        Tinyint)  
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = descripcion
+      From   dbo.catCriteriosTbl
+      Where  criterio  = @PsCriterio
+      And    valor     = @PnValor
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Busca la Descripción del Criterio Seleccionado.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaDescripcionCriterio';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> Create Or Alter Function Fn_BuscaDescripcionGeneral
+  (@PsTabla        Sysname,
+   @PsColumna      Sysname,
+   @PnValor        Tinyint)  
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = descripcion
+      From   dbo.catGeneralesTbl
+      Where  tabla     = @PsTabla
+      And    columna   = @PsColumna
+      And    valor     = @PnValor
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Busca la Descripción del Catálogo General.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaDescripcionGeneral';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> Create Or Alter Function dbo.Fn_BuscaDireccionIP()
+Returns Varchar(30)
+With encryption 
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(30)
+
+   Begin
+      Set @o_salida = Cast(ConnectionProperty('client_net_address') As Varchar(30))
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Calcula la Dirección IP.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaDireccionIP';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> Create Or Alter Function dbo.Fn_BuscaValorParametro
+  (@PnIdParametroGral     Char(25),
+   @PnIdConsulta          Bit)
+Returns Varchar(150)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100),
+      @w_parametroChar    Varchar(150),
+      @w_parametroNumber  Numeric(24, 6),
+      @w_parametroFecha   Datetime
+
+   Begin
+      Select @w_parametroChar    = parametroChar,
+             @w_parametroNumber  = parametroNumber,
+             @w_parametroFecha   = parametroFecha
+      From   dbo.conParametrosGralesTbl
+      Where  idParametroGral  = @PnIdParametroGral
+      If @@Rowcount = 0
+         Begin
+            Select @w_parametroChar   = Null,
+                   @w_parametroNumber = Null,
+                   @w_parametroFecha  = Null,
+                   @o_salida          = ''
+         End
+      Else
+         Begin
+            Set @o_salida = Case When @PnIdConsulta = 0
+                                 Then @w_parametroChar
+                                 When @PnIdConsulta = 1
+                                 Then Cast(@w_parametroNumber As Varchar)
+                                 Else Convert(Char(10), @w_parametrofecha, 103)
+                            End
+         End
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta el  Valor de un Parámetro Seleccionado.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaValorParametro';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> 203> 204> 205> 206> 207> 208> 209> 210> 211> 212> 213> 214> 215> 216> 217> 218> 219> 220> 221> 222> 223> 224> 225> 226> 227> 228> 229> 230> 231> 232> 233> 234> Create Or Alter Function Fn_ConvierteNumeroLetra
+  (@PnValor     Decimal(18, 6))
+
+Returns Varchar(4000)
+
+As
+Begin
+   Declare
+      @o_salida           Varchar(1000),
+      @w_PrimeraParte     Varchar(1000),
+      @w_SegundaParte     Varchar(1000),
+      @w_valor            Integer,
+      @w_valorDecimal     Decimal(18, 6),
+      @w_valorNuevo       Integer,
+      @w_decimales         Varchar(20)
+
+   Declare
+      @TablaValores1      Table
+      (valor              Integer,
+       descripcion        Varchar(100))
+
+   Declare
+      @TablaValores2      Table
+      (valor              Integer,
+       descripcion        Varchar(100) Default 'CIENTOS')
+
+   Begin
+
+      If @PnValor > 999999999999
+         Begin
+            Return ''
+         End
+
+      Insert into @TablaValores1
+      Select       0, 'CERO'
+      Union
+      Select       1, 'UN'
+      Union
+      Select       2, 'DOS'
+      Union
+      Select       3, 'TRES'
+      Union
+      Select       4, 'CUATRO'
+      Union
+      Select       5, 'CINCO'
+      Union
+      Select       6, 'SEIS'
+      Union
+      Select       7, 'SIETE'
+      Union
+      Select       8, 'OCHO'
+      Union
+      Select       9, 'NUEVE'
+      Union
+      Select      10, 'DIEZ'
+      Union
+      Select      11, 'ONCE'
+      Union
+      Select      12, 'DOCE'
+      Union
+      Select      13, 'TRECE'
+      Union
+      Select      14, 'CATORCE'
+      Union
+      Select      15, 'QUINCE'
+      Union
+      Select      20, 'VEINTE'
+      Union
+      Select      30, 'TREINTA'
+      Union
+      Select      40, 'CUARENTA'
+      Union
+      Select      50, 'CINCUENTA'
+      Union
+      Select      60, 'SESENTA'
+      Union
+      Select      70, 'SETENTA'
+      Union
+      Select      80, 'OCHENTA'
+      Union
+      Select      90, 'NOVENTA'
+      Union
+      Select     100, 'CIEN'
+      Union
+      Select     500, 'QUINIENTOS'
+      Union
+      Select     700, 'SETECIENTOS'
+      Union
+      Select     900, 'NOVECIENTOS'
+      Union
+      Select    1000, 'MIL'
+      Union
+      Select 1000000, 'UN MILLON'
+
+      Insert into @TablaValores2
+      (valor)
+      Select     200
+      Union
+      Select     300
+      Union
+      Select     400
+      Union
+      Select     600
+      Union
+      Select     800
+
+--
+
+      Select @w_PrimeraParte = '',
+             @w_SegundaParte = '',
+             @w_valor        = Cast(@PnValor As Integer),
+             @w_valorDecimal = (@PnValor - @w_valor) * 100.00,
+             @w_decimales    = 'PESOS CON ' + Format(@w_valorDecimal, '00') + '/100 CTS'
+
+      Select @o_salida = descripcion
+      From   @TablaValores1
+      Where  valor  = @w_valor
+      If @@Rowcount > 0
+         Begin
+            Goto  Salida
+         End
+
+      Select @o_salida = descripcion
+      From   @TablaValores2
+      Where  valor = @w_valor
+      If @@Rowcount > 0
+          Begin
+             Select @w_valorNuevo   = @w_valor / 100,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       =  @w_PrimeraParte +  'CIENTOS'
+
+             Goto  Salida
+          End
+
+      If @w_valor Between 16 And 19
+         Begin
+            Select @w_valorNuevo   = @w_valor - 10,
+                   @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra(@w_valorNuevo),
+                   @o_salida       = 'DIECI' + @w_PrimeraParte
+
+            Goto  Salida
+       End
+
+       If @w_valor Between 21 And 29
+          Begin
+             Select @w_valorNuevo   = @w_valor - 20,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       = 'VEINTI' + @w_PrimeraParte
+
+             Goto  Salida
+          End
+
+       If @w_valor Between 31 And 99
+          Begin
+             Select @w_valorNuevo   = Convert(integer, @w_valor / 10 ) * 10,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @w_valorNuevo   = @w_valor % 10,
+                    @w_SegundaParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       = @w_PrimeraParte + ' Y ' + @w_SegundaParte
+
+             Goto  Salida
+       End
+
+       If @w_valor Between 101 And 199
+          Begin
+             Select @w_valorNuevo   = @w_valor - 100,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       = 'CIENTO ' + @w_PrimeraParte
+
+             Goto  Salida
+          End
+
+
+       If @w_valor Between 201 And 999
+          Begin
+             Select @w_valorNuevo   = (@w_valor / 100 ) * 100,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @w_valorNuevo   = @w_valor % 100,
+                    @w_SegundaParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       = @w_PrimeraParte + @w_SegundaParte
+
+             Goto  Salida
+          End
+
+       If @w_valor Between 1001 And 1999
+          Begin
+             Select @w_valorNuevo   = @w_valor % 1000,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       =  'MIL ' + @w_PrimeraParte
+
+             Goto  Salida
+          End
+
+       If @w_valor Between 2000 And 999999
+          Begin
+             Select @w_valorNuevo   = @w_valor / 1000,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @w_valorNuevo   = @w_valor % 1000,
+                    @w_SegundaParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       =  @w_PrimeraParte + ' MIL ' + @w_SegundaParte
+
+             Goto  Salida
+          End
+
+       If @w_valor Between 1000001 And 1999999
+          Begin
+             Select @w_valorNuevo   = @w_valor % 1000000,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       =  'UN MILLON ' + @w_PrimeraParte
+
+             Goto  Salida
+          End
+
+       If @w_valor Between 2000000 And 999999999999
+          Begin
+             Select @w_valorNuevo   = @w_valor / 1000000,
+                    @w_PrimeraParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @w_valorNuevo   = @w_valor % 1000000,
+                    @w_SegundaParte = dbo.Fn_ConvierteNumeroLetra (@w_valorNuevo),
+                    @o_salida       = @w_PrimeraParte  + ' MILLONES ' + @w_SegundaParte
+
+             Goto  Salida
+         End
+    End
+
+Salida:
+
+    Select @o_salida = Replace(@o_salida, ' ' + @w_decimales, ''),
+           @o_salida = @o_salida + ' ' + @w_decimales
+
+    Return @o_salida
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Convierte un Cifra Númerica en Letras.',
+   @w_procedimiento  NVarchar(250) = 'Fn_ConvierteNumeroLetra';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> Create Or Alter Function dbo.Fn_Desencripta_cadena
+ (@PsCadena         Varbinary(Max))
+Returns Varchar(Max)
+As
+
+Begin
+/*
+Obtetivo: Funci¢n que Desencripta una Cadena de Caracteres
+Versi¢n:  1
+
+*/
+   Declare
+      @o_salida              Varchar(Max),
+	  @w_llave               Varchar(150)
+   Begin
+
+      Select @w_llave = parametroChar
+      From   dbo.conParametrosGralesTbl
+      Where  idParametroGral = 4;
+      
+	  Select @o_salida = Convert(Varchar(Max), Decryptbypassphrase(@w_llave, @PsCadena))
+
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Funci¢n que Desencripta una Cadena de Caracteres',
+   @w_procedimiento  NVarchar(250) = 'Fn_Desencripta_cadena';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> Create Or Alter Function dbo.Fn_Encripta_cadena
+ (@PsCadena         Varchar(max))
+Returns Varchar(Max)
+As
+
+Begin
+   Declare
+      @o_salida              Varchar(Max),
+      @w_llave               Varchar(150)
+   Begin
+
+      Select @w_llave = parametroChar
+      From   dbo.conParametrosGralesTbl
+      Where  idParametroGral = 4
+      
+      Select @o_salida = Convert(Varchar(Max),EncryptByPassPhrase(@w_llave, @PsCadena), 1)
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Encripta una Cadena de Caracteres',
+   @w_procedimiento  NVarchar(250) = 'Fn_Encripta_cadena';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> Create Or Alter Function dbo.Fn_existe_tabla  
+(@PsTabla      Sysname)  
+Returns Smallint  
+As  
+  
+Begin  
+   Declare  
+      @w_existe      Tinyint  = 0  
+  
+   Begin  
+      If Exists ( Select Top 1 1  
+                  From   Sysobjects  
+                  Where  Uid  = 1  
+                  And    Type = 'U'  
+                  And    Name = @PsTabla)  
+         Begin  
+            Set @w_existe = 1  
+         End  
+  
+   End  
+  
+   Return(@w_existe)  
+  
+End  
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> Create Or Alter Function Fn_GeneraNombreTablaDin
+ (@PsNombre     Sysname)
+Returns Sysname
+
+Begin
+   Declare
+      @o_salida           Sysname
+
+   Begin
+      Set @o_salida = Rtrim(Rtrim(@PsNombre) + '_' +
+                     Replace(Replace(Replace(Substring(Convert(Varchar, Getdate(), 126), 1, 30),':', ''), '.',''), '-', ''))
+   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Genera Nombres para Tablas Dinámicas Seleccionando un Prefijo.',
+   @w_procedimiento  NVarchar(250) = 'Fn_GeneraNombreTablaDin';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> Create Or Alter Function dbo.Fn_splitStringColumna(
+    @PsCadena      Varchar(Max),
+    @PsDelimitador Char(1),
+    @PnColumna     Tinyint)
+Returns Varchar(50)
+
+As
+Begin
+   Declare @w_x      Smallint = 1,
+           @w_cadena Varchar(100),
+           @w_salida Varchar(10),
+           @w_len    Smallint
+   
+   Set @w_len = Len(@PsCadena)
+   
+   While @w_x <= @w_len
+   Begin
+      Set @w_cadena = @PsCadena
+   
+      If @w_x = @PnColumna
+         Begin
+            If Charindex(@PsDelimitador, @w_cadena) <> 0
+               Begin
+                  Set @w_salida = Substring(@w_cadena, 1, Charindex(@PsDelimitador, @w_cadena) -1)
+               End
+            Else
+               Begin
+                  Set @w_salida = @w_cadena
+               End
+            Break
+         End
+      
+      Set @PsCadena = Substring(@w_cadena, Charindex(@PsDelimitador, @w_cadena) + 1, Len(@w_cadena))
+      Set @w_x = @w_x + 1
+   End
+   
+   Return @w_salida
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Realiza una Extracción de un Texto desde una cadena Seleccionada.',
+   @w_procedimiento  NVarchar(250) = 'Fn_splitStringColumna';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> Create  Or Alter Function dbo.Fn_BuscaMes
+ (@intMes       Integer)
+Returns Varchar(15)
+
+As
+Begin
+    Declare
+       @w_salida   Varchar(15)
+
+       Select @w_salida = Substring(descripcion, 1, 3)
+       From   dbo.catCriteriosTbl
+       Where  criterio = 'mes'
+       And    valor    = @intMes
+       If @@Rowcount = 0
+          Begin
+             Set @w_salida = Char(32);
+          End
+
+Return @w_salida
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catCriteriosTbl las iniciales del mes.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaMes';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> Create Or Alter Function dbo.Fn_ValidaCorreo
+   (@PsCorreo Varchar(300))
+Returns Bit
+
+As
+Begin
+   Declare
+      @w_salida Bit,
+      @w_aux    Varchar(150)  ;
+
+   Set @w_salida = 0
+
+   If @PsCorreo Like '[a-z,0-9,_,-,.,a-z]%@[a-z,0-9,_,-,.,a-z]%.[a-z][a-z]%'
+      Begin
+         Set @w_salida = 1
+      End
+
+   If CharIndex('@',@PsCorreo) <> 0
+      Begin
+         Set @w_aux = Substring(@PsCorreo, CharIndex('@', @PsCorreo) + 1, Len(@PsCorreo))
+         If CharIndex('@', @w_aux) <> 0
+            Begin
+               Set @w_salida = 0
+               Return @w_salida
+            End
+      End
+
+   If CharIndex('.@', @PsCorreo) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If CharIndex('..', @PsCorreo) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If CharIndex(',', @PsCorreo) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Right(@PsCorreo, 1) Not Between 'a' And 'z'
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+
+   If Charindex(' ', @PsCorreo Collate SQL_Latin1_General_CP850_CI_AS) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Charindex('‚', @PsCorreo Collate SQL_Latin1_General_CP850_CI_AS) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Charindex('¡', @PsCorreo Collate SQL_Latin1_General_CP850_CI_AS) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Charindex('¢', @PsCorreo Collate SQL_Latin1_General_CP850_CI_AS) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Charindex('£', @PsCorreo Collate SQL_Latin1_General_CP850_CI_AS) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   If Charindex('¤', @PsCorreo Collate Modern_Spanish_CI_AI) <> 0
+      Begin
+         Set @w_salida = 0
+         Return @w_salida
+      End
+
+   Return @w_salida;
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Funci¢n de Validaci¢n de direcci¢n de correo.',
+   @w_procedimiento  NVarchar(250) = 'Fn_ValidaCorreo';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> Create Or Alter Function dbo.Fn_ValidaAnioBisiesto
+   (@PnAnio            Smallint,  
+    @PdFecha           Datetime,  
+    @PnDiasCiclos      Numeric(7,4),  
+    @PnDiasDisfrutados Numeric(7,4))  
+Returns Numeric(7, 4)  
+As
+Begin  
+   Declare @w_salida      Numeric(7, 4),  
+           @w_fechaInicio Datetime,  
+           @w_fechaFin    Datetime,  
+           @w_fechaBase   Varchar(10)  
+  
+   Set @w_fechaBase = Cast(@PnAnio As varchar) + Format(Month(@PdFecha), '00') + Format(Day(@PdFecha), '00')
+   If IsDate(@w_fechaBase) = 1  
+      Begin  
+         Select @w_fechaInicio = @w_fechaBase,  
+                @w_fechaFin    = Dateadd(yy, 1, @w_fechaBase)  
+      End  
+   Else  
+      Begin  
+         Set @w_fechaBase = Cast(@PnAnio As varchar) + Format(Month(@PdFecha), '00') + '28'  
+         Select @w_fechaInicio = @w_fechaBase,  
+                @w_fechaFin    = Dateadd(yy, 1, @w_fechaBase)  
+      End  
+  
+   If @w_fechaFin < Getdate()  
+      Begin  
+         Set @w_salida = (Datediff(dd, @w_fechaInicio, @w_fechaFin) / 365.0 * @PnDiasCiclos) - @PnDiasDisfrutados  
+      End  
+   Else  
+      Begin  
+         Set @w_salida = (Datediff(dd, @w_fechaInicio, Getdate()) / 365.0) - (@PnDiasCiclos - @PnDiasDisfrutados)  
+      End   
+  
+   Return Abs(@w_salida)
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función de Consulta de Año Bisiesto.',
+   @w_procedimiento  NVarchar(250) = 'Fn_ValidaAnioBisiesto';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> Create Or Alter Function dbo.Fn_BuscaValoresCriterio
+  (@PsCriterio     Char(25),
+   @PnValor        Smallint,
+   @PnIdConsulta   Bit)    -- 0 = Valor Adicional, 1 = Desccripción 
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100),
+      @w_descripcion      Varchar(100),
+      @w_valorAdicional   Varchar(100)
+
+   Begin
+      Select @w_descripcion    = descripcion,
+             @w_valorAdicional = valorAdicional
+      From   dbo.catCriteriosTbl
+      Where  criterio  = @PsCriterio
+      And    valor     = @PnValor
+      If @@Rowcount = 0
+         Begin
+            Select @w_descripcion    = ' ',
+                   @w_valorAdicional = ' '
+         End
+   End
+
+   Set @o_salida = Case When @PnIdConsulta = 1
+                        Then Isnull(@w_descripcion,    ' ')
+                        Else Isnull(@w_valorAdicional, ' ')
+                   End
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta la entidad catCriteriosTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaValoresCriterio';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function', 
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function', 
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> Create Or ALter Function dbo.Fn_BuscaNombrePais
+  (@PnIdPais     Integer,
+   @PnOpcion     Tinyint)
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = Case When @PnOpcion = 1
+                              Then nombre
+                              When @PnOpcion = 2
+                              Then abreviatura
+                              When @PnOpcion = 3
+                              Then nacionalidad
+                              Else 'Opción de Consulta Fuera de Rango'
+                         End
+      From   dbo.catPaisesTbl
+      Where  idPais = @PnIdPais
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Return(@o_salida)
+
+End
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catPaisesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaNombrePais';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> Create Or Alter Function dbo.Fn_BuscaNombreEstado
+  (@PnIdPais       Smallint,
+   @PnIdEstado     Smallint,
+   @PnOpcion       Tinyint)  
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = Case When @PnOpcion = 1
+                              Then nombre
+                              When @PnOpcion = 2
+                              Then abreviatura
+                              When @PnOpcion = 3
+                              Then claveSAT
+                              Else 'Opción de Consulta Fuera de Rango'
+                         End
+      From   dbo.catEstadosTbl
+      Where  idPais   = @PnIdPais
+      And    idEstado = @PnIdEstado
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catPaisesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaNombreEstado';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> Create Or Alter Function dbo.Fn_BuscaNombreMunicipio
+  (@PnIdPais       Smallint,
+   @PnIdEstado     Smallint,
+   @PnIdMunicipio  Smallint,
+   @PnOpcion       Tinyint)  
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = Case When @PnOpcion = 1
+                              Then nombre
+                              When @PnOpcion = 2
+                              Then abreviatura
+                              Else 'Opción de Consulta Fuera de Rango'
+                         End
+      From   dbo.catMunicipiosTbl
+      Where  idPais      = @PnIdPais
+      And    idEstado    = @PnIdEstado
+      And    IdMunicipio = @PnIdMunicipio
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catMunicipiosTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaNombreMunicipio';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 2> 3> 
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> Create Or Alter Function dbo.Fn_BuscaNombreCiudad
+  (@PnIdPais       Smallint,
+   @PnIdEstado     Smallint,
+   @PnIdCiudad     Smallint,
+   @PnOpcion       Tinyint)  
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = Case When @PnOpcion = 1
+                              Then nombre
+                              When @PnOpcion = 2
+                              Then abreviatura
+                              Else 'Opción de Consulta Fuera de Rango'
+                         End
+      From   dbo.catCiudadesTbl
+      Where  idPais   = @PnIdPais
+      And    idEstado = @PnIdEstado
+      And    idCiudad = @PnIdCiudad
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catCiudadesTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaNombreCiudad';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> Create Or Alter Function dbo.Fn_BuscaNombreColonia
+  (@PnIdPais       Smallint,
+   @PnIdEstado     Smallint,
+   @PnIdCiudad     Smallint,
+   @PnIdMunicipio  Smallint,
+   @PnIdColonia    SMallint,
+   @PnOpcion       Tinyint)
+Returns Varchar(100)
+As
+
+Begin
+   Declare
+      @o_salida           Varchar(100)
+
+   Begin
+      Select @o_salida = Case When @PnOpcion = 1
+                              Then nombre
+                              When @PnOpcion = 2
+                              Then abreviatura
+                              Else 'Opción de Consulta Fuera de Rango'
+                         End
+      From   dbo.catColoniasTbl
+      Where  idPais              = @PnIdPais
+      And    idEstado            = @PnIdEstado
+      And    IsNull(idCiudad, 0) = Isnull(@PnIdCiudad, 0)
+      And    idMunicipio         = @PnIdMunicipio
+      And    idColonia           = @PnIdColonia
+      If @@Rowcount = 0
+         Begin
+            Set @o_salida = ' '
+         End
+   End
+
+   Set @o_salida = Isnull(@o_salida, ' ')
+
+   Return(@o_salida)
+
+End
+
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta en la entidad catColoniasTbl.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaNombreColonia';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> Create Or Alter Function dbo.Fn_BuscaResultadosParametros
+   (@PnParametro        Integer,
+    @PsColumna          Sysname)
+Returns Varchar(500)
+
+Begin
+   Declare
+      @o_Salida  Varchar ( 500)
+
+   Begin
+      If @PsColumna Not In ('valor', 'cadena')
+         Begin
+            Set @o_Salida = 'Error en Selección'
+            Return (@o_Salida)
+         End
+
+      If @PsColumna = 'cadena'
+         Begin
+            Select @o_Salida = cadena
+            From   dbo.parametros With (Nolock)
+            Where  id = @PnParametro
+         End
+      Else
+         Begin
+            Select @o_Salida = Cast(Valor As Varchar)
+            From   dbo.parametros With (Nolock)
+            Where  id = @PnParametro
+         End
+
+      Return (@o_Salida)
+
+   End
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 
+--
+-- Comentarios
+--
+
+Declare
+   @w_valor          Nvarchar(250) = 'Función que Consulta la entidad parametros.',
+   @w_procedimiento  NVarchar(250) = 'Fn_BuscaResultadosParametros';
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'Fn'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'dbo',
+                                      @level1type = 'Function',
+                                      @level1name = @w_procedimiento
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'dbo',
+                                        @level1type = 'Function',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> Create Or Alter Function dbo.Fn_existe_tabla  
+(@PsTabla      Sysname)  
+Returns Smallint  
+As  
+  
+Begin  
+   Declare  
+      @w_existe      Tinyint  = 0  
+  
+   Begin  
+      If Exists ( Select Top 1 1  
+                  From   Sysobjects  
+                  Where  Uid  = 1  
+                  And    Type = 'U'  
+                  And    Name = @PsTabla)  
+         Begin  
+            Set @w_existe = 1  
+         End  
+  
+   End  
+  
+   Return(@w_existe)  
+  
+End  
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> Create Or Alter Function dbo.Fn_existe_tabla  
+(@PsTabla      Sysname)  
+Returns Smallint  
+As  
+  
+Begin  
+   Declare  
+      @w_existe      Tinyint  = 0  
+  
+   Begin  
+      If Exists ( Select Top 1 1  
+                  From   Sysobjects  
+                  Where  Uid  = 1  
+                  And    Type = 'U'  
+                  And    Name = @PsTabla)  
+         Begin  
+            Set @w_existe = 1  
+         End  
+  
+   End  
+  
+   Return(@w_existe)  
+  
+End  
+1> 

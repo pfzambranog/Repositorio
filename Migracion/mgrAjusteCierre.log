@@ -1,0 +1,1982 @@
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> 203> 204> 205> 206> 207> 208> 209> 210> 211> 212> 213> 214> 215> 216> 217> 218> 219> 220> 221> 222> 223> 224> 225> 226> 227> 228> 229> 230> 231> 232> 233> 234> 235> 236> 237> 238> 239> 240> 241> 242> 243> 244> 245> 246> 247> 248> 249> 250> 251> 252> 253> 254> 255> 256> 257> 258> 259> 260> 261> 262> 263> 264> 265> 266> 267> 268> 269> 270> 271> 272> 273> 274> 275> 276> 277> 278> 279> 280> 281> 282> 283> 284> 285> 286> 287> 288> 289> 290> 291> 292> 293> 294> 295> 296> 297> 298> 299> 300> 301> 302> 303> 304> 305> 306> 307> 308> 309> 310> 311> 312> 313> 314> 315> 316> 317> 318> 319> 320> 321> 322> 323> 324> 325> 326> 327> 328> 329> 330> 331> 332> 333> 334> 335> 336> 337> 338> 339> 340> 341> 342> 343> 344> 345> 346> 347> 348> 349> 350> 351> 352> 353> 354> 355> 356> 357> 358> 359> 360> 361> 362> 363> 364> 365> 366> 367> 368> 369> 370> 371> 372> 373> 374> 375> 376> 377> 378> 379> 380> 381> 382> 383> 384> 385> 386> 387> 388> 389> 390> 391> 392> 393> 394> 395> 396> 397> 398> 399> 400> 401> 402> 403> 404> 405> 406> 407> 408> 409> 410> 411> 412> 413> 414> 415> 416> 417> 418> 419> 420> 421> 422> 423> 424> 425> 426> 427> 428> 429> 430> 431> 432> 433> 434> 435> 436> 437> 438> 439> 440> 441> 442> 443> 444> 445> 446> 447> 448> 449> 450> 451> 452> 453> 454> 455> 456> 457> 458> 459> 460> 461> 462> 463> 464> 465> 466> 467> 468> 469> 470> 471> 472> 473> 474> 475> 476> 477> 478> 479> 480> 481> 482> 483> 484> 485> 486> 487> 488> 489> 490> 491> 492> 493> 494> 495> 496> 497> 498> 499> 500> 501> 502> 503> 504> 505> 506> 507> 508> 509> 510> 511> 512> 513> 514> 515> 516> 517> 518> 519> 520> 521> 522> 523> 524> 525> 526> 527> 528> 529> 530> 531> 532> 533> 534> 535> 536> 537> 538> 539> 540> 541> 542> 543> 544> 545> 546> 547> 548> 549> 550> 551> 552> 553> 554> 555> 556> 557> 558> 559> 560> 561> 562> 563> 564> 565> 566> 567> 568> 569> 570> 571> 572> 573> 574> 575> 576> 577> 578> 579> 580> 581> 582> 583> 584> 585> 586> 587> 588> 589> 590> 591> 592> 593> 594> 595> 596> 597> 598> 599> 600> 601> 602> 603> 604> 605> 606> 607> 608> 609> 610> 611> 612> 613> 614> 615> 616> 617> 618> 619> 620> 621> 622> 623> 624> 625> 626> 627> 628> 629> 630> 631> 632> 633> 634> 635> 636> 637> 638> 639> 640> 641> 642> 643> 644> 645> 646> 647> 648> 649> 650> 651> 652> 653> 654> 655> 656> 657> 658> 659> 660> 661> 662> 663> 664> 665> 666> 667> 668> 669> 670> 671> 672> 673> 674> 675> 676> 677> 678> 679> 680> 681> 682> 683> 684> 685> 686> 687> 688> 689> 690> 691> 692> 693> 694> 695> 696> 697> 698> 699> 700> 701> 702> 703> 704> 705> 706> 707> 708> 709> 710> 711> 712> 713> 714> 715> 716> 717> 718> 719> 720> 721> 722> 723> 724> 725> 726> 727> 728> 729> 730> 731> 732> 733> 734> 735> 736> 737> 738> 739> 740> 741> 742> 743> 744> 745> 746> 747> 748> 749> 750> 751> 752> /*
+
+-- Declare
+   -- @PnAnio                Smallint            = 2023,
+   -- @PnMes                 Tinyint             = 13,
+   -- @PsUsuario             Varchar(  20)       = Null,
+   -- @PnEstatus             Integer             = 0,
+   -- @PsMensaje             Varchar( 250)       = ' ' ;
+-- Begin
+
+   -- Execute dbo.Spp_generaAsientoAjusteCierreAnio @PnAnio      = @PnAnio,
+                                                 -- @PnMes       = @PnMes,
+                                                 -- @PsUsuario   = @PsUsuario,
+                                                 -- @PnEstatus   = @PnEstatus Output,
+                                                 -- @PsMensaje   = @PsMensaje Output;
+
+   -- Select @PnEstatus, @PsMensaje
+   -- Return
+-- End
+-- Go
+
+--
+
+-- Objeto:        Spp_generaAsientoAjusteCierreAnio.
+-- Objetivo:      Genera asiento de Ajuste de fin de ejericio.
+-- Fecha:         05/11/2024
+-- Programador:   Pedro Zambrano
+
+
+*/
+
+Create Or Alter Procedure dbo.Spp_generaAsientoAjusteCierreAnio
+  (@PnAnio                Smallint,
+   @PnMes                 Tinyint,
+   @PsUsuario             Varchar(20)         = Null,
+   @PnEstatus             Integer             = 0   Output,
+   @PsMensaje             Varchar( 250)       = ' ' Output)
+As
+Declare
+   @w_Error             Integer,
+   @w_linea             Integer,
+   @w_operacion         Integer,
+   @w_registro          Integer,
+   @w_Region_id         Integer,
+   @w_Sucursal_id       Integer,
+   @w_idEstatus         Tinyint,
+   @w_sector_id         Varchar(    2),
+   @w_desc_error        Varchar(  250),
+   @w_referencia        Varchar(   20),
+   @w_idusuario         Varchar(  Max),
+   @w_tipoPoliza        Varchar(    3),
+   @w_Mes_Mov           Varchar(    3),
+   @w_scta              Varchar(    4),
+   @w_numPoliza         Varchar(   20),
+   @w_llave             Varchar(   20),
+   @w_usuario           Varchar(  20),
+   @w_filtro            Varchar(  Max),
+   @w_sql               Varchar(  Max),
+   @w_anioAnterior      Smallint,
+   @w_mesAnterior       Smallint,
+   @w_anioProximo       Smallint,
+   @w_mesProximo        Smallint,
+   @w_mesFin            Smallint,
+   @w_idAuxiliar        Smallint,
+   @w_fechaIni          Date,
+   @w_fechaFin          Date,
+   @w_Fecha_Mov         Date,
+   @w_fechaCaptura      Datetime,
+   @w_importeDebe       Decimal(18, 2),
+   @w_importeHaber      Decimal(18, 2),
+   @w_importeSaldo      Decimal(18, 2),
+   @w_importeCar        Decimal(18, 2),
+   @w_importeAbo        Decimal(18, 2),
+   @w_consulta          NVarchar(1500),
+   @w_param             NVarchar( 750),
+   @w_comilla           Char(1),
+   @w_clave             Char(1),
+   @w_sucursable        Tinyint,
+   @w_perAnt            Bit,
+   @w_tabla             Sysname;
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    Off
+
+   Select @PnEstatus         = 0,
+          @PsMensaje         = Null,
+          @w_operacion       = 9999,
+          @w_perAnt          = 0,
+          @w_fechaCaptura    = Getdate(),
+          @w_comilla         = Char(39),
+          @w_tipoPoliza      = 'PDI',
+          @w_tabla           = 'CatalogoAuxiliar',
+          @w_fecha_Mov       = Eomonth(Convert(Date, Concat('01/', @PnMes -1, '/', @PnAnio), 103)),
+          @w_sucursable      = Isnull(dbo.Fn_BuscaResultadosParametros(12, 'valor'), 0);
+
+--
+-- Obtención del usuario de la aplicación para procesos batch.
+--
+
+   If @PsUsuario Is Null
+      Begin
+         Select @w_idusuario = parametroChar
+         From   dbo.conParametrosGralesTbl
+         Where  idParametroGral = 6;
+
+         Select @w_consulta   = Concat('Select @o_usuario = dbo.Fn_Desencripta_cadena (', @w_idusuario, ')'),
+                @w_param      = '@o_usuario    Nvarchar(20) Output';
+
+         Begin Try
+            Execute Sp_executeSql @w_consulta, @w_param, @o_usuario = @w_usuario Output
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_linea      = Error_line(),
+                    @w_desc_error = Substring (Error_Message(), 1, 200)
+
+         End   Catch
+
+         If @w_error != 0
+            Begin
+               Select @w_error, @w_desc_error;
+
+               Goto Salida
+            End
+
+      End
+   Else
+      Begin
+         Set @w_usuario = @PsUsuario
+      End
+
+--
+-- Validaciones
+--
+
+   Select  Top 1 @w_idEstatus = idEstatus
+   From    dbo.ejercicios With (Nolock)
+   Where   ejercicio = @PnAnio;
+   If @@Rowcount = 0
+      Begin
+         Select @PnEstatus  = 8021,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If @w_idEstatus = 0
+      Begin
+         Select @PnEstatus  = 8022,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If @w_idEstatus = 2
+      Begin
+         Select @w_perAnt   = 1,
+                @w_tabla    = 'CatalogoAuxiliarHist'
+      End
+
+   If Not Exists ( Select Top 1 1
+                   From   dbo.catCriteriosTbl Whith (Nolock)
+                   Where  criterio = 'mes'
+                   And    valor    = @PnMes)
+      Begin
+         Select @PnEstatus  = 8023,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Select @w_idEstatus = idEstatus
+   From   dbo.control With (Nolock)
+   Where  ejercicio = @PnAnio
+   And    mes       = @PnMes;
+   If @@Rowcount = 0
+      Begin
+         Select @PnEstatus  = 8024,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If @w_idEstatus = 0
+      Begin
+         Select @PnEstatus  = 8025,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+--
+-- Se valida si existe el catálogo para el mes a procesar.
+--
+
+   If @w_sucursable      = 2
+      Begin
+         If @w_perAnt = 0
+            Begin
+               If Not Exists (Select Top 1 1
+                        From   dbo.CatalogoAuxiliar With (Nolock)
+                        Where  Ejercicio = @PnAnio
+                        And    mes       = @PnMes)
+                  Begin
+                     Select @PnEstatus  = 8026,
+                            @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                     Set Xact_Abort Off
+                     Return
+                  End
+            End
+         Else
+            Begin
+               If Not Exists (Select Top 1 1
+                              From   dbo.CatalogoAuxiliarHist With (Nolock)
+                              Where  Ejercicio = @PnAnio
+                              And    mes       = @PnMes)
+                  Begin
+                     Select @PnEstatus  = 8026,
+                            @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                     Set Xact_Abort Off
+                     Return
+                  End
+            End
+      End
+
+   If Not Exists (Select Top 1 1
+                  From   dbo.Catalogo With (Nolock)
+                  Where  Ejercicio = @PnAnio
+                  And    mes       = @PnMes)
+      Begin
+         Select @PnEstatus  = 8026,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+--
+-- Se valida si es el último periodo ejercicio
+--
+
+   Select @w_mesFin = Max(valor)
+   From   dbo.catCriteriosTbl Whith (Nolock)
+   Where  criterio = 'mes';
+
+   If @w_mesFin != @PnMes
+      Begin
+         Select @PnEstatus  = 8027,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Select @w_Mes_Mov = Upper(Substring(descripcion, 1, 3))
+   From   dbo.catCriteriosTbl Whith (Nolock)
+   Where  criterio = 'mes'
+   And    valor    = @PnMes;
+
+--
+-- Fin de Validaciones
+--
+
+--
+-- Se obtiene la cuenta auxiliar de resultados.
+--
+
+   Select @w_idAuxiliar = parametroNumber
+   From   dbo.conParametrosGralesTbl With (Nolock)
+   Where  idParametroGral = 8
+
+   Select @w_llave = CuentaInterna
+   From   dbo.Cuentas_predeterminadas With (Nolock)
+   Where  id = @w_idAuxiliar;
+
+--
+-- Se valida que la cuenta Este relacionado a todas las Areas.
+--
+
+   If @w_sucursable = 2
+      Begin
+         If @w_perAnt = 0
+            Begin
+               If Not Exists (Select top 1 1
+                              From   dbo.CatalogoAuxiliar c With (Nolock)
+                              Where  c.Ejercicio = @PnAnio
+                              And    c.mes       = @PnMes
+                              And    c.Llave     = @w_llave)
+                  Begin
+                     Select @PnEstatus  = 8030,
+                            @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                     Set Xact_Abort Off
+                     Return
+                  End
+            End
+         Else
+            Begin
+               If Not Exists (Select top 1 1
+                              From   dbo.CatalogoAuxiliarHist c With (Nolock)
+                              Where  c.Ejercicio = @PnAnio
+                              And    c.mes       = @PnMes
+                              And    c.Llave     = @w_llave)
+                  Begin
+                     Select @PnEstatus  = 8030,
+                            @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                     Set Xact_Abort Off
+                     Return
+                  End
+            End
+      End
+
+--
+--
+--
+
+
+   If Not Exists ( Select Top 1 1
+                   From   dbo.Catalogo With (Nolock)
+                   Where  Ejercicio = @PnAnio
+                   And    mes       = @PnMes
+                   And    llave     = @w_llave)
+      Begin
+         Select @PnEstatus  = 8029,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+--
+-- Obtener los mayores de las cuentas de resultado.
+--
+
+   Declare
+      C_Cuentas Cursor For
+      Select Substring(c.llave, 1, 4),
+             Row_number () Over (Order By Substring(c.llave, 1, 4) )
+      From   dbo.Rangos a With (NolocK)
+      Join   dbo.SubRangos b
+      On     b.Rango_id = a.Rango_id
+      Join   dbo.Catalogo c
+      On     Substring(c.llave, 1, 4) Between b.Llave_final And b.Llave_final
+      Where  a.Naturaleza_id In ('IN', 'EG')
+      And    c.ejercicio = @PnAnio
+      Group  By Substring(c.llave, 1, 4);
+
+   Begin
+      Open  C_Cuentas
+      While @@Fetch_Status < 1
+      Begin
+         Fetch C_Cuentas Into @w_scta, @w_registro
+         If @@Fetch_Status != 0
+            Begin
+               Break
+            End
+
+         If @w_registro = 1
+            Begin
+               Set @w_filtro = Concat(' And Substring(llave, 1, 4) In ( ', @w_comilla, @w_scta, @w_comilla)
+            End
+         Else
+            Begin
+               Set @w_filtro = Concat(@w_filtro, ', ', @w_comilla, @w_scta, @w_comilla)
+            End
+
+      End
+      Close      C_CUentas
+      Deallocate C_CUentas
+   End
+
+   Set @w_filtro = @w_filtro + ')'
+
+--
+-- Se declara el cursor para obtener la Región y asignar el comprobante por región.
+--
+
+   If @w_sucursable = 2
+      Begin
+         Set @w_sql = 'Declare
+                          C_Region_id  Cursor For ' +
+                          'Select Region_id, Sucursal_id, Sector_id '      +
+                          'From   dbo.Rangos a With (NolocK) ' +
+                          'Join   dbo.SubRangos b '            +
+                          'On     b.Rango_id = a.Rango_id '    +
+                          'Join   dbo.' + @w_tabla +  ' c '     +
+                          'On     Substring(c.llave, 1, 4) Between b.Llave_final And b.Llave_final ' +
+                          'Where  a.Naturaleza_id In (' + @w_comilla + 'IN' + @w_comilla + ', ' +
+                                                          @w_comilla + 'EG' + @w_comilla + ') ' +
+                          'And    Ejercicio = ' + Cast(@PnAnio As Varchar) + ' ' +
+                          'And    mes       = ' + Cast(@PnMes  As Varchar) + ' ' +
+                          'And    SAct     != 0 ' +
+                          'Group  By Region_id, Sucursal_id, Sector_id ' +
+                          'Order  By 1, 2';
+      End
+   Else
+      Begin
+         Set @w_sql = 'Declare
+                          C_Region_id  Cursor For ' +
+                          'Select 0, 0, 0 ';
+      End
+
+
+--
+-- Inicio de Proceso.
+--
+
+   Begin Transaction
+
+      Execute (@w_sql)
+
+      Open C_Region_id
+      While @@Fetch_status < 1
+      Begin
+         Fetch C_Region_id Into @w_Region_id, @w_Sucursal_id, @w_sector_id
+         If @@Fetch_status != 0
+            Begin
+               Break
+            End
+
+         If @w_sucursable = 2
+            Begin
+               If @w_perAnt = 0
+                  Begin
+                     If Not Exists (Select top 1 1
+                                    From   dbo.CatalogoAuxiliar c
+                                    Where  c.Llave       = @w_llave
+                                    And    c.Sucursal_id = Sucursal_id
+                                    And    c.Region_id   = @w_Region_id
+                                    And    c.Ejercicio   = @PnAnio
+                                    And    c.mes         = @PnMes)
+                        Begin
+                           Rollback Transaction
+
+                           Select @PnEstatus  = 8029,
+                                  @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                           Close      C_Region_id
+                           Deallocate C_Region_id
+
+                           Set Xact_Abort Off
+                           Goto Salida
+                        End
+                  End
+               Else
+                  Begin
+                     If Not Exists (Select top 1 1
+                                    From   dbo.CatalogoAuxiliarHist c
+                                    Where  c.Llave       = @w_llave
+                                    And    c.Sucursal_id = Sucursal_id
+                                    And    c.Region_id   = @w_Region_id
+                                    And    c.Ejercicio   = @PnAnio
+                                    And    c.mes         = @PnMes)
+                        Begin
+                           Rollback Transaction
+
+                           Select @PnEstatus  = 8029,
+                                  @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+                           Close      C_Region_id
+                           Deallocate C_Region_id
+
+                           Set Xact_Abort Off
+                           Goto Salida
+                        End
+                  End
+            End
+
+--
+-- Se obtiene el numero de la póliza por Región.
+--
+
+         Select @w_numPoliza = Max(Substring(referencia, 4, 5))
+         From   dbo.polizaAnio With (Nolock)
+         Where  Substring(referencia, 1, 3) = @w_tipoPoliza
+         And    ejercicio    = @PnAnio
+         And    mes          = @PnMes;
+         If @w_numPoliza Is Null
+            Begin
+               Set @w_numPoliza = '00000'
+            End
+
+         Select @w_numPoliza = Format(Cast(@w_numPoliza As Integer) + 1, '00000'),
+                @w_numPoliza = @w_tipoPoliza + @w_numPoliza
+
+--
+-- Actualización de las pólizas (cabecero).
+--
+
+         Begin Try
+            Insert Into dbo.polizaAnio
+           (Referencia, Fecha_Mov, Fecha_Cap, Concepto,
+            Cargos,     Abonos,    TCons,     Usuario,
+            TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela,
+            Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
+            Ejercicio,  Mes)
+            Select @w_numPoliza, @w_fecha_Mov, @w_fechaCaptura,
+                   Concat('Póliza de cierre de ejercicio ',@PnAnio),
+                   0 Cargos,        0 Abonos,    0 Tcons,         @w_usuario,
+                   @w_tipoPoliza,   Char(32),    Null,            Null,
+                   1,               @w_Mes_Mov,  Null,            Null,
+                   @PnAnio,         @PnMes
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_linea      = Error_line(),
+                    @w_desc_error = Substring (Error_Message(), 1, 200)
+
+         End Catch
+
+         If IsNull(@w_error, 0) <> 0
+            Begin
+               Rollback Transaction
+
+               Select @PnEstatus = @w_error,
+                      @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+               Close      C_Region_id
+               Deallocate C_Region_id
+
+               Set Xact_Abort Off
+               Goto Salida
+            End
+
+--
+-- Insert de los movimientos de la póliza Final.
+--
+
+         If @w_sucursable = 2
+            Begin
+               Set @w_sql = 'Select ' + @w_comilla + @w_numPoliza + @w_comilla + ', Row_number () Over (Order By llave ), Moneda, ' + @w_comilla + Cast(@w_Fecha_Mov As Varchar) + @w_comilla + ', ' +
+                                    'Llave,    Concat(' + @w_comilla + 'Ajuste Cierre ejercicio ' + @w_comilla + ',' + Cast(@PnAnio As Varchar) + '), Abs(Sact),   Char(32), ' +
+                                    'Case When Sact < 0 '                              +
+                                         'Then '  + @w_comilla + 'C' + @w_comilla + ' ' +
+                                         'Else '  + @w_comilla + 'A' + @w_comilla + ' ' +
+                                    'End Clave, ' + @w_comilla + Cast(@w_fechaCaptura As Varchar) + @w_comilla + ', ' +
+                                    'Sector_id,     Sucursal_id, Region_id, ' +
+                                    'Case When Sact < 0 ' +
+                                         'Then Abs(SAct) ' +
+                                         'Else 0 '    +
+                                    'End  Importe_Cargo, ' +
+                                    'Case When Sact > 0 '  +
+                                         'Then Abs(SAct) '      +
+                                         'Else 0 '         +
+                                    'End Importe_Abono, Concat(' + @w_comilla + 'Cierre ejercicio ' + @w_comilla + ', ' + Cast(@PnAnio As Varchar)+ '), ' +
+                                    'Null TipoPolizaConta, Null ReferenciaFiscal, Null Fecha_Doc, Ejercicio, ' +
+                                    'mes ' +
+                            'From   dbo.' + @w_tabla + ' a With (Nolock) ' +
+                            'Where  ejercicio = '   + Cast(@PnAnio As Varchar) + ' ' +
+                            'And    mes       = '   + Cast(@PnMes  As Varchar) + ' ' +
+                            'And    niv       = 1 ' +
+                            'And    region_id = '   + Cast(@w_Region_id As Varchar) + ' ' +
+                            'And    Sact     != 0 ' + @w_filtro;
+            End
+         Else
+            Begin
+               Set @w_sql = 'Select ' + @w_comilla + @w_numPoliza + @w_comilla + ', Row_number () Over (Order By llave ), Moneda, ' + @w_comilla + Cast(@w_Fecha_Mov As Varchar) + @w_comilla + ', ' +
+                                    'Llave,    Concat(' + @w_comilla + 'Cierre ejercicio ' + @w_comilla + ',' + Cast(@PnAnio As Varchar) + '), Abs(Sact),   Char(32), ' +
+                                    'Case When Sact < 0 '                              +
+                                         'Then '  + @w_comilla + 'C' + @w_comilla + ' ' +
+                                         'Else '  + @w_comilla + 'A' + @w_comilla + ' ' +
+                                    'End Clave, ' + @w_comilla + Cast(@w_fechaCaptura As Varchar) + @w_comilla + ', ' +
+                                    @w_comilla + '00' + @w_comilla + ' Sector_id,     0 Sucursal_id, 0 Region_id, ' +
+                                    'Case When Sact < 0 ' +
+                                         'Then Abs(SAct) ' +
+                                         'Else 0 '    +
+                                    'End  Importe_Cargo, ' +
+                                    'Case When Sact > 0 '  +
+                                         'Then Abs(SAct) '      +
+                                         'Else 0 '         +
+                                    'End Importe_Abono, Concat(' + @w_comilla + 'Cierre ejercicio ' + @w_comilla + ', ' + Cast(@PnAnio As Varchar)+ '), ' +
+                                    'Null TipoPolizaConta, Null ReferenciaFiscal, Null Fecha_Doc, Ejercicio, ' +
+                                    'mes ' +
+                            'From   dbo.Catalogo a With (Nolock) ' +
+                            'Where  ejercicio = '   + Cast(@PnAnio As Varchar) + ' ' +
+                            'And    mes       = '   + Cast(@PnMes  As Varchar) + ' ' +
+                            'And    niv       = 1 ' +
+                            'And    Sact     != 0 ' + @w_filtro;
+            End
+
+         Begin Try
+            Insert Into dbo.MovimientosAnio
+           (Referencia,      Cons,             Moneda,        Fecha_mov,
+            Llave,           Concepto,         Importe,       Documento,
+            Clave,           FecCap,           Sector_id,     Sucursal_id,
+            Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+            TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+            mes)
+            Execute (@w_sql)
+            Set @w_registro = @@Rowcount;
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_linea      = Error_line(),
+                    @w_desc_error = Substring (Error_Message(), 1, 200)
+
+         End Catch
+
+         If IsNull(@w_error, 0) <> 0
+            Begin
+               Rollback Transaction
+
+               Select @PnEstatus = @w_error,
+                      @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+               Close      C_Region_id
+               Deallocate C_Region_id
+               Set Xact_Abort Off
+               Goto Salida
+            End
+
+         If @w_registro = 0
+            Begin
+               Rollback Transaction
+
+               Select @PnEstatus = 8172,
+                      @PsMensaje = dbo.Fn_Busca_MensajeError (@w_operacion, @PnEstatus);
+
+               Close      C_Region_id
+               Deallocate C_Region_id
+               Set Xact_Abort Off
+               Goto Salida
+            End
+
+--
+-- Consulta de los Cargos y Abonos del período.
+--
+
+         Select @w_importeDebe  = Sum(Case When clave = 'C'
+                                           Then Importe
+                                           Else 0
+                                      End),
+                @w_importeHaber = Sum(Case When clave = 'A'
+                                           Then Importe
+                                           Else 0
+                                      End)
+         From   dbo.MovimientosAnio With (Nolock)
+         Where  Referencia    = @w_numPoliza
+         And    Fecha_mov     = @w_fecha_Mov
+         And    ejercicio     = @PnAnio
+         And    mes           = @PnMes;
+
+--
+-- Se calcula la Utilidad / Perdida del periodo.
+--
+
+
+         Set @w_importeSaldo = @w_importeDebe - @w_importeHaber
+
+         If @w_importeSaldo < 0
+            Begin
+               Select @w_clave      = 'C',
+                      @w_importeCar = @w_importeSaldo,
+                      @w_importeAbo = 0;
+            End;
+         Else
+            Begin
+               Select @w_clave      = 'A',
+                      @w_importeCar = 0,
+                      @w_importeAbo = @w_importeSaldo;
+            End;
+
+         Set @w_registro = @w_registro + 1
+
+         Insert Into dbo.MovimientosAnio
+        (Referencia,      Cons,             Moneda,        Fecha_mov,
+         Llave,           Concepto,         Importe,       Documento,
+         Clave,           FecCap,           Sector_id,     Sucursal_id,
+         Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+         TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+         mes)
+         Select @w_numPoliza, @w_registro,               '00',             @w_Fecha_Mov,
+                @w_llave,     Concat('Ajuste Cierre ejercicio', @PnAnio),  Abs(@w_importeSaldo), Char(32),
+                @w_clave,     @w_fechaCaptura,           @w_sector_id,  @w_Sucursal_id,
+                @w_Region_id, @w_importeCar,             @w_importeAbo, Concat('Ajuste Cierre ejercicio ', @PnAnio),
+                Null,         Null,                      Null,          @PnAnio,
+                @PnMes;
+
+         Select @w_importeDebe  = Sum(Case When clave = 'C'
+                                           Then Importe
+                                           Else 0
+                                      End),
+                @w_importeHaber = Sum(Case When clave = 'A'
+                                           Then Importe
+                                           Else 0
+                                      End),
+                @w_registro     = Count(1)
+         From   dbo.MovimientosAnio With (Nolock)
+         Where  Referencia    = @w_numPoliza
+         And    Fecha_mov     = @w_fecha_Mov
+         And    ejercicio     = @PnAnio
+         And    mes           = @PnMes;
+
+         Begin Try
+            Update dbo.PolizaAnio
+            Set    Cargos = @w_importeDebe,
+                   Abonos = @w_importeHaber,
+                   TCons  = @w_registro,
+                   status = Case When @w_importeDebe = @w_importeHaber
+                                 Then 2
+                                 Else 3
+                            End
+            From   dbo.PolizaAnio
+            Where  Referencia    = @w_numPoliza
+            And    Fecha_Mov     = @w_fecha_Mov
+            And    ejercicio     = @PnAnio
+            And    mes           = @PnMes;
+
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_linea      = Error_line(),
+                    @w_desc_error = Substring (Error_Message(), 1, 230)
+         End   Catch
+
+         If Isnull(@w_Error, 0) <> 0
+            Begin
+               Select @PnEstatus = @w_error,
+                      @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+               Set Xact_Abort Off
+               Return
+
+            End
+      End
+
+      Close      C_Region_id
+      Deallocate C_Region_id
+
+   Commit Transaction
+
+Salida:
+
+   Set Xact_Abort Off
+   Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 
+--
+-- Comentarios.
+--
+
+Declare
+   @w_valor          Varchar(1500) = 'Genera asiento de Ajuste de fin de ejericio.',
+   @w_procedimiento  Varchar( 100) = 'Spp_generaAsientoAjusteCierreAnio'
+
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'Dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento;
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'Dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> 47> 48> 49> 50> 51> 52> 53> 54> 55> 56> 57> 58> 59> 60> 61> 62> 63> 64> 65> 66> 67> 68> 69> 70> 71> 72> 73> 74> 75> 76> 77> 78> 79> 80> 81> 82> 83> 84> 85> 86> 87> 88> 89> 90> 91> 92> 93> 94> 95> 96> 97> 98> 99> 100> 101> 102> 103> 104> 105> 106> 107> 108> 109> 110> 111> 112> 113> 114> 115> 116> 117> 118> 119> 120> 121> 122> 123> 124> 125> 126> 127> 128> 129> 130> 131> 132> 133> 134> 135> 136> 137> 138> 139> 140> 141> 142> 143> 144> 145> 146> 147> 148> 149> 150> 151> 152> 153> 154> 155> 156> 157> 158> 159> 160> 161> 162> 163> 164> 165> 166> 167> 168> 169> 170> 171> 172> 173> 174> 175> 176> 177> 178> 179> 180> 181> 182> 183> 184> 185> 186> 187> 188> 189> 190> 191> 192> 193> 194> 195> 196> 197> 198> 199> 200> 201> 202> 203> 204> 205> 206> 207> 208> 209> 210> 211> 212> 213> 214> 215> 216> 217> 218> 219> 220> 221> 222> 223> 224> 225> 226> 227> 228> 229> 230> 231> 232> 233> 234> 235> 236> 237> 238> 239> 240> 241> 242> 243> 244> 245> 246> 247> 248> 249> 250> 251> 252> 253> 254> 255> 256> 257> 258> 259> 260> 261> 262> 263> 264> 265> 266> 267> 268> 269> 270> 271> 272> 273> 274> 275> 276> 277> 278> 279> 280> 281> 282> 283> 284> 285> 286> 287> 288> 289> 290> 291> 292> 293> 294> 295> 296> 297> 298> 299> 300> 301> 302> 303> 304> 305> 306> 307> 308> 309> 310> 311> 312> 313> 314> 315> 316> 317> 318> 319> 320> 321> 322> 323> 324> 325> 326> 327> 328> 329> 330> 331> 332> 333> 334> 335> 336> 337> 338> 339> 340> 341> 342> 343> 344> 345> 346> 347> 348> 349> 350> 351> 352> 353> 354> 355> 356> 357> 358> 359> 360> 361> 362> 363> 364> 365> 366> 367> 368> 369> 370> 371> 372> 373> 374> 375> 376> 377> 378> 379> 380> 381> 382> 383> 384> 385> 386> 387> 388> 389> 390> 391> 392> 393> 394> 395> 396> 397> 398> 399> 400> 401> 402> 403> 404> 405> 406> 407> 408> 409> 410> 411> 412> 413> 414> 415> 416> 417> 418> 419> 420> 421> 422> 423> 424> 425> 426> 427> 428> 429> 430> 431> 432> 433> 434> 435> 436> 437> 438> 439> 440> 441> 442> 443> 444> 445> 446> 447> 448> 449> 450> 451> 452> 453> 454> 455> 456> 457> 458> 459> 460> 461> 462> 463> 464> 465> 466> 467> 468> 469> 470> 471> 472> 473> 474> 475> 476> 477> 478> 479> 480> 481> 482> 483> 484> 485> 486> 487> 488> 489> 490> 491> 492> 493> 494> 495> 496> 497> 498> 499> 500> 501> 502> 503> 504> 505> 506> 507> 508> 509> 510> 511> 512> 513> 514> 515> 516> 517> 518> 519> 520> 521> 522> 523> 524> 525> 526> 527> 528> 529> 530> 531> 532> 533> 534> 535> 536> 537> 538> 539> 540> 541> 542> 543> 544> 545> 546> 547> 548> 549> 550> 551> 552> 553> 554> 555> 556> 557> 558> 559> 560> 561> 562> 563> 564> 565> 566> 567> 568> 569> 570> 571> 572> 573> 574> 575> 576> 577> 578> 579> 580> 581> 582> 583> 584> 585> 586> 587> 588> 589> 590> 591> 592> 593> 594> 595> 596> 597> 598> 599> 600> 601> 602> 603> 604> 605> 606> 607> 608> 609> 610> 611> 612> 613> 614> 615> 616> 617> 618> 619> 620> 621> 622> 623> 624> 625> 626> 627> 628> 629> 630> 631> 632> 633> 634> 635> 636> 637> 638> 639> 640> 641> 642> 643> 644> 645> 646> 647> 648> 649> 650> 651> 652> 653> 654> 655> 656> 657> 658> 659> 660> 661> 662> 663> 664> 665> 666> 667> 668> 669> 670> 671> 672> 673> 674> 675> 676> 677> 678> 679> 680> 681> 682> 683> 684> 685> 686> 687> 688> 689> 690> 691> 692> 693> 694> 695> 696> 697> 698> 699> 700> 701> 702> 703> 704> 705> 706> 707> 708> 709> 710> 711> 712> 713> 714> 715> 716> 717> 718> 719> 720> 721> 722> 723> 724> 725> 726> 727> 728> 729> 730> 731> 732> 733> 734> 735> 736> 737> 738> 739> 740> 741> 742> 743> 744> 745> 746> 747> 748> 749> 750> 751> 752> 753> 754> 755> 756> 757> 758> 759> 760> 761> 762> 763> 764> 765> 766> 767> 768> 769> 770> 771> 772> 773> 774> 775> 776> 777> 778> 779> 780> 781> 782> 783> 784> 785> 786> 787> 788> 789> 790> 791> 792> 793> 794> 795> 796> 797> 798> 799> 800> 801> 802> 803> 804> 805> 806> 807> 808> 809> 810> 811> 812> 813> 814> 815> 816> 817> 818> 819> 820> 821> 822> 823> 824> 825> 826> 827> 828> 829> 830> 831> 832> 833> 834> 835> 836> 837> 838> 839> 840> 841> 842> 843> 844> 845> 846> 847> 848> 849> 850> 851> 852> 853> 854> 855> 856> 857> 858> 859> 860> 861> 862> 863> 864> 865> 866> 867> 868> 869> 870> 871> 872> 873> 874> 875> 876> 877> 878> 879> 880> 881> 882> 883> 884> 885> 886> 887> 888> 889> 890> 891> 892> 893> 894> 895> 896> 897> 898> 899> 900> 901> 902> 903> 904> 905> 906> 907> 908> 909> 910> 911> 912> 913> 914> 915> 916> 917> 918> 919> 920> 921> 922> 923> 924> 925> 926> 927> 928> 929> 930> 931> 932> 933> 934> 935> 936> 937> 938> 939> 940> 941> 942> 943> 944> 945> 946> 947> 948> 949> 950> 951> 952> 953> 954> 955> 956> 957> 958> 959> 960> 961> 962> 963> 964> 965> 966> 967> 968> 969> 970> 971> 972> 973> 974> 975> 976> 977> 978> 979> 980> 981> 982> 983> 984> 985> 986> 987> 988> 989> 990> 991> 992> 993> 994> 995> 996> 997> 998> 999> 1000> 1001> 1002> 1003> 1004> 1005> 1006> 1007> 1008> 1009> 1010> 1011> 1012> 1013> 1014> 1015> 1016> 1017> 1018> 1019> 1020> 1021> 1022> 1023> 1024> 1025> 1026> 1027> 1028> 1029> 1030> 1031> 1032> 1033> 1034> 1035> 1036> 1037> 1038> 1039> 1040> 1041> 1042> 1043> 1044> 1045> 1046> 1047> 1048> 1049> 1050> 1051> 1052> 1053> 1054> 1055> 1056> 1057> 1058> 1059> 1060> 1061> 1062> 1063> 1064> 1065> 1066> 1067> 1068> 1069> 1070> 1071> 1072> 1073> 1074> 1075> 1076> 1077> 1078> 1079> 1080> 1081> 1082> 1083> 1084> 1085> 1086> 1087> 1088> 1089> 1090> 1091> 1092> 1093> 1094> 1095> 1096> 1097> 1098> 1099> 1100> 1101> 1102> 1103> 1104> 1105> 1106> 1107> 1108> 1109> 1110> 1111> 1112> 1113> 1114> 1115> 1116> 1117> 1118> 1119> 1120> 1121> 1122> 1123> 1124> 1125> 1126> 1127> 1128> 1129> 1130> 1131> 1132> 1133> 1134> 1135> 1136> 1137> 1138> 1139> 1140> 1141> 1142> 1143> 1144> 1145> 1146> 1147> 1148> 1149> 1150> 1151> 1152> 1153> 1154> 1155> 1156> 1157> 1158> 1159> 1160> 1161> /*
+
+-- Declare
+   -- @PnAnio                Smallint            = 2023,
+   -- @PnMes                 Tinyint             = 13,
+   -- @PnEstatus             Integer             = 0,
+   -- @PsMensaje             Varchar( 250)       = ' ' ;
+-- Begin
+
+   -- Execute dbo.Spp_AjustaSaldosMes @PnAnio      = @PnAnio,
+                                   -- @PnMes       = @PnMes,
+                                   -- @PnEstatus   = @PnEstatus Output,
+                                   -- @PsMensaje   = @PsMensaje Output;
+
+   -- Select @PnEstatus, @PsMensaje
+   -- Return
+-- End
+-- Go
+
+--
+
+-- Objeto:        Spp_AjustaSaldosMes.
+-- Objetivo:      Ajusta los saldos contables posterior al cierre.
+-- Fecha:         04/11/2024
+-- Programador:   Pedro Zambrano
+-- Versión:       1
+
+
+*/
+
+Create Or Alter Procedure Spp_AjustaSaldosMes
+  (@PnAnio                Smallint,
+   @PnMes                 Tinyint,
+   @PsUsuario             Varchar( 20)        = Null,
+   @PnEstatus             Integer             = 0      Output,
+   @PsMensaje             Varchar( 250)       = ' '    Output)
+As
+
+Declare
+   @w_Error             Integer,
+   @w_linea             Integer,
+   @w_operacion         Integer,
+   @w_idEstatus         Tinyint,
+   @w_desc_error        Varchar(250),
+   @w_referencia        Varchar( 20),
+   @w_idusuario         Varchar(  Max),
+   @w_anioAnterior      Smallint,
+   @w_mesAnterior       Smallint,
+   @w_anioProximo       Smallint,
+   @w_mesProximo        Smallint,
+   @w_mesFin            Smallint,
+   @w_fechaCaptura      Datetime,
+   @w_usuario           Nvarchar(  20),
+   @w_sql               NVarchar(1500),
+   @w_param             NVarchar( 750),
+   @w_comilla           Char(1),
+   @w_sucursable        Tinyint,
+   @w_anio              Smallint,
+   @w_mes               Tinyint,
+   @w_anioProc          Smallint,
+   @w_mesProc           Tinyint,
+   @w_mesMin            Tinyint,
+   @w_mesMax            Tinyint,
+   @w_perAnt            Bit,
+   @w_registros         Integer,
+   @w_regCat            Integer,
+   @w_regCatAux         Integer,
+   @w_registro          Integer,
+   @w_secuencia         Integer,
+   @w_secCat            Integer,
+   @w_secCatAux         Integer,
+   @w_Sector_id         Integer,
+   @w_Sucursal_id       Integer,
+   @w_Region_id         Integer,
+   @w_idAuxiliar        Smallint,
+   @w_tabla             Sysname,
+   @w_Llave             Varchar(20),
+   @w_Moneda            Varchar( 2),
+   @w_scta              Varchar(    4),
+   @w_Car               Decimal(18, 2),
+   @w_Abo               Decimal(18, 2);
+
+Begin
+   Set Nocount       On
+   Set Xact_Abort    On
+   Set Ansi_Nulls    Off
+
+   Select @PnEstatus         = 0,
+          @PsMensaje         = Null,
+          @w_operacion       = 9999,
+          @w_perAnt          = 0,
+          @w_registros       = 0,
+          @w_regCat          = 0,
+          @w_regCatAux       = 0,
+          @w_secuencia       = 0,
+          @w_secCat          = 0,
+          @w_secCatAux       = 0,
+          @w_anio            = @PnAnio,
+          @w_mes             = @PnMes,
+          @w_tabla           = 'CatalogoAuxiliar',
+          @w_fechaCaptura    = Getdate(),
+          @w_sucursable      = Isnull(dbo.Fn_BuscaResultadosParametros(12, 'valor'), 0);
+
+--
+-- Obtención del usuario de la aplicación para procesos batch.
+--
+
+   If @PsUsuario Is Null
+      Begin
+         Select @w_idusuario = parametroChar
+         From   dbo.conParametrosGralesTbl
+         Where  idParametroGral = 6;
+
+         Select @w_sql   = Concat('Select @o_usuario = dbo.Fn_Desencripta_cadena (', @w_idusuario, ')'),
+                @w_param = '@o_usuario    Nvarchar(20) Output';
+
+         Begin Try
+            Execute Sp_executeSql @w_sql, @w_param, @o_usuario = @w_usuario Output
+         End Try
+
+         Begin Catch
+            Select  @w_Error      = @@Error,
+                    @w_linea      = Error_line(),
+                    @w_desc_error = Substring (Error_Message(), 1, 200)
+
+         End   Catch
+
+         If @w_error != 0
+            Begin
+               Select @w_error, @w_desc_error;
+
+               Goto Salida
+            End
+      End
+   Else
+      Begin
+         Set @w_usuario = @PsUsuario;
+      End
+
+--
+-- Se obtiene la cuenta auxiliar de resultados.
+--
+
+   Select @w_idAuxiliar = parametroNumber
+   From   dbo.conParametrosGralesTbl With (Nolock)
+   Where  idParametroGral = 8;
+
+   Select @w_llave = CuentaInterna
+   From   dbo.Cuentas_predeterminadas With (Nolock)
+   Where  id = @w_idAuxiliar;
+
+
+--
+-- Validaciones
+--
+
+   Select  Top 1 @w_idEstatus = idEstatus
+   From    dbo.ejercicios With (Nolock)
+   Where   ejercicio = @PnAnio;
+   If @@Rowcount = 0
+      Begin
+         Select @PnEstatus  = 8021,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If @w_idEstatus = 0
+      Begin
+         Select @PnEstatus  = 8022,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If @w_idEstatus = 2
+      Begin
+         Select @w_perAnt   = 1,
+                @w_tabla    = 'CatalogoAuxiliarHist'
+      End
+
+   If Not Exists ( Select Top 1 1
+                   From   dbo.catCriteriosTbl Whith (Nolock)
+                   Where  criterio = 'mes'
+                   And    valor    = @PnMes)
+      Begin
+         Select @PnEstatus  = 8023,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   Select @w_mesMin = Min(Valor),
+          @w_mesMax = Max(Valor)
+   From   dbo.catCriteriosTbl Whith (Nolock)
+   Where  criterio = 'mes'
+
+   Select @w_anioProc = ejercicio,
+          @w_mesProc  = mes
+   From   dbo.control With (Nolock)
+   Where  idEstatus = 1
+   If @@Rowcount = 0
+      Begin
+         Select @PnEstatus  = 8024,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+   If Not Exists ( Select Top  1 1
+                   From   dbo.polizaAnio a With (Nolock)
+                   Where  ejercicio  = @PnAnio
+                   And    mes        = @PnMes)
+      Begin
+         Select @PnEstatus  = 138,
+                @PsMensaje =  'Error.: ' + (dbo.Fn_Busca_MensajeError(@w_operacion, @PnEstatus))
+
+         Set Xact_Abort Off
+         Return
+      End
+
+--
+-- Creación de Tablas Temporales
+--
+
+  Create Table #TempCatalogo
+  (Secuencia    Integer        Not Null Identity(1, 1) Primary key,
+   Llave        Varchar(20)    Not Null,
+   Moneda       Varchar( 2)    Not Null,
+   Niv          Smallint       Not Null,
+   Car          Decimal(18, 2) Not Null,
+   Abo          Decimal(18, 2) Not Null,
+   Ejercicio    Smallint       Not Null,
+   mes          Tinyint        Not Null,
+   Index TempCatalogoIdx01 Unique (ejercicio, mes, Niv, llave, moneda));
+
+  Create Table #TempCatalogoAux
+  (Secuencia    Integer        Not Null Identity(1, 1) Primary key,
+   Llave        Varchar(20)    Not Null,
+   Moneda       Varchar(20)    Not Null,
+   Niv          Smallint       Not Null,
+   Sector_id    Integer        Not Null,
+   Sucursal_id  Integer        Not Null,
+   Region_id    Integer        Not Null,
+   Car          Decimal(18, 2) Not Null,
+   Abo          Decimal(18, 2) Not Null,
+   Ejercicio    Smallint       Not Null,
+   mes          Tinyint        Not Null,
+   Index TempCatalogoAuxIdx01 Unique (ejercicio, mes, Niv, llave, moneda, Sector_id,
+         Sucursal_id, Region_id));
+
+   Create Table #TempPeriodos
+  (secuencia      Integer Not Null Identity (1, 1) Primary Key,
+   ejercicio      Integer Not Null,
+   mes            Integer Not Null);
+
+   Create Table #TempCuentasResult
+  (secuencia      Integer    Not Null Identity (1, 1) Primary Key,
+   cuenta         Varchar(4) Not Null)
+
+--
+-- Inicio de proceso
+--
+
+--
+-- Consulta las cuentas de Resultados
+--
+
+   Insert #TempCuentasResult
+  (cuenta)
+   Select Substring(c.llave, 1, 4)
+   From   dbo.Rangos a With (NolocK)
+   Join   dbo.SubRangos b
+   On     b.Rango_id = a.Rango_id
+   Join   dbo.Catalogo c
+   On     Substring(c.llave, 1, 4) Between b.Llave_final And b.Llave_final
+   Where  a.Naturaleza_id In ('IN', 'EG')
+   And    c.ejercicio = @PnAnio
+   Group  By Substring(c.llave, 1, 4);
+
+--
+-- Buscar los periodos a actualizar.
+--
+
+   While @w_anio <= @w_anioProc
+   Begin
+      While @w_mes <= @w_mesMax
+      Begin
+         Insert Into #TempPeriodos
+         (ejercicio, mes)
+         Select @w_anio, @w_mes
+
+         Select @w_registros = @w_registros + 1,
+                @w_mes       = @w_mes + 1;
+
+         If @w_anio = @w_anioProc And
+            @w_mes  = @w_mesProc
+            Begin
+               Break
+            End
+
+      End
+
+      Select @w_anio = @w_anio + 1,
+             @w_mes  = @w_mesMin;
+
+   End
+
+--
+-- Consulta a los movimientos de ajustes.
+--
+
+   Insert Into  #TempCatalogo
+  (Llave, Moneda,      Niv,          Car,
+   Abo,   ejercicio,   mes)
+   Select a.Llave, a.moneda, 1 Niv,
+          Sum(Case When Clave = 'C'
+                   Then Importe
+                   Else 0
+              End),
+          Sum(Case When Clave = 'A'
+                   Then Importe
+                   Else 0
+              End), a.ejercicio, a.mes
+   From   dbo.MovimientosAnio   a With (Nolock)
+   Where  a.ejercicio      = @PnAnio
+   And    a.mes            = @PnMes
+   Group  By  a.Llave, a.moneda, a.ejercicio, a.mes;
+   Set @w_regCat = @@Rowcount
+
+   Begin Try
+      Insert Into  #TempCatalogo
+     (Llave, Moneda,      Niv,          Car,
+      Abo,   ejercicio,   mes)
+      Select Concat(Substring(a.llave, 1, 12), Replicate(0, 4)), a.Moneda, 2 Niv, Sum(a.car),
+             Sum(a.Abo),      a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio = @PnAnio
+      And    a.mes       = @PnMes
+      And    a.Niv       = 1
+      Group  By Substring(a.llave, 1, 12), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 3 Niv, Sum(a.car),
+             Sum(a.Abo),      a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio   = @PnAnio
+      And    a.mes         = @PnMes
+      And    a.Niv         = 1
+      Group  By Substring(a.llave, 1, 10), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 4 Niv, Sum(a.car),
+             Sum(a.Abo), a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio    = @PnAnio
+      And    a.mes          = @PnMes
+      And    a.Niv          = 1
+      Group  By Substring(a.llave, 1, 8), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 5 Niv, Sum(a.car),
+             Sum(a.Abo),      a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio     = @PnAnio
+      And    a.mes           = @PnMes
+      And    a.Niv           = 1
+      Group  By Substring(a.llave, 1, 6), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 6 Niv, Sum(a.car),
+             Sum(a.Abo),      a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio     = @PnAnio
+      And    a.mes           = @PnMes
+      And    a.Niv           = 1
+      Group  By Substring(a.llave, 1, 4), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 7 Niv, Sum(a.car),
+             Sum(a.Abo), a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio     = @PnAnio
+      And    a.mes           = @PnMes
+      And    a.Niv           = 1
+      Group  By Substring(a.llave, 1, 2), a.Moneda, a.ejercicio, a.mes
+      Union
+      Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 8 Niv, Sum(a.car),
+             Sum(a.Abo),      a.ejercicio, a.mes
+      From   #TempCatalogo a
+      Where  a.ejercicio     = @PnAnio
+      And    a.mes           = @PnMes
+      And    a.Niv           = 1
+      Group  By Substring(a.llave, 1, 1), a.Moneda, a.ejercicio, a.mes
+      Set @w_regCat = @w_regCat + @@Rowcount
+
+   End Try
+
+   Begin Catch
+      Select  @w_Error      = @@Error,
+              @w_linea      = Error_line(),
+              @w_desc_error = Substring (Error_Message(), 1, 200)
+
+   End Catch
+
+   If IsNull(@w_error, 0) <> 0
+      Begin
+
+         Select @PnEstatus = @w_error,
+                @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+         Set Xact_Abort Off
+         Goto Salida
+      End
+
+--
+
+   If @w_sucursable = 2
+      Begin
+         Insert Into  #TempCatalogoAux
+        (Llave,     Moneda, Niv,  Sector_id, Sucursal_id,
+         Region_id, Car,    Abo,  ejercicio, mes)
+         Select a.Llave, a.moneda, 1 Niv, Sector_id, Sucursal_id,
+                Region_id,
+                Sum(Case When Clave = 'C'
+                         Then Importe
+                         Else 0
+                    End),
+                Sum(Case When Clave = 'A'
+                         Then Importe
+                         Else 0
+                    End), a.ejercicio, a.mes
+         From   dbo.MovimientosAnio   a With (Nolock)
+         Where  a.ejercicio      = @PnAnio
+         And    a.mes            = @PnMes
+         Group  By a.Llave, a.moneda,    Sector_id, Sucursal_id,
+                Region_id,  a.ejercicio, a.mes;
+
+         Set    @w_regCatAux =  @@Rowcount
+
+      Begin Try
+         Insert Into  #TempCatalogoAux
+        (Llave,       Moneda,     Niv,       Sector_id,
+         Sucursal_id, Region_id,  Car,       Abo,
+         ejercicio, mes)
+         Select Concat(Substring(a.llave, 1, 12), Replicate(0, 4)), a.Moneda, 2 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,       Sum(a.car),       Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux       a
+         Where  a.ejercicio      = @PnAnio
+         And    a.mes            = @PnMes
+         And    a.Niv            = 1
+         Group  By Substring(a.llave, 1, 12), a.Moneda,    a.Sector_id,
+                a.Sucursal_id, a.Region_id,   a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 3 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,       Sum(a.car),       Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux     a
+         Where  a.ejercicio      = @PnAnio
+         And    a.mes            = @PnMes
+         And    a.Niv            = 1
+         Group  By Substring(a.llave, 1, 10), a.Moneda, a.Sector_id,
+                a.Sucursal_id, a.Region_id, a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 4 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,       Sum(a.car),       Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux        a
+         Where  a.ejercicio             = @PnAnio
+         And    a.mes                   = @PnMes
+         And    a.Niv                   = 1
+         Group  By Substring(a.llave, 1, 8), a.Moneda,    a.Sector_id,
+                a.Sucursal_id, a.Region_id,      a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 5 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,      Sum(a.car),        Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux         a
+         Where  a.ejercicio             = @PnAnio
+         And    a.mes                   = @PnMes
+         And    a.Niv                   = 1
+         Group  By Substring(a.llave, 1, 6), a.Moneda, a.Sector_id,
+                a.Sucursal_id, a.Region_id, a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 6 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,      Sum(a.car),        Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux      a
+         Where  a.ejercicio             = @PnAnio
+         And    a.mes                   = @PnMes
+         And    a.Niv                   = 1
+         Group  By Substring(a.llave, 1, 4), a.Moneda, a.Sector_id,
+                a.Sucursal_id, a.Region_id, a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 7 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,      Sum(a.car),        Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux     a
+         Where  a.ejercicio             = @PnAnio
+         And    a.mes                   = @PnMes
+         And    a.Niv                   = 1
+         Group  By Substring(a.llave, 1, 2), a.Moneda,    a.Sector_id,
+                a.Sucursal_id, a.Region_id,  a.ejercicio, a.mes
+         Union
+         Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 8 Niv, a.Sector_id,
+                a.Sucursal_id, a.Region_id,      Sum(a.car),        Sum(a.Abo),
+                a.ejercicio,   a.mes
+         From   #TempCatalogoAux      a
+         Where  a.ejercicio             = @PnAnio
+         And    a.mes                   = @PnMes
+         And    a.Niv                   = 1
+         Group  By Substring(a.llave, 1, 1), a.Moneda,   a.Sector_id,
+                a.Sucursal_id, a.Region_id, a.ejercicio, a.mes
+
+         Set    @w_regCatAux = @w_regCatAux + @@Rowcount
+      End Try
+
+      Begin Catch
+         Select  @w_Error      = @@Error,
+                 @w_linea      = Error_line(),
+                 @w_desc_error = Substring (Error_Message(), 1, 200)
+
+      End Catch
+
+      If IsNull(@w_error, 0) <> 0
+         Begin
+
+            Select @PnEstatus = @w_error,
+                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+            Set Xact_Abort Off
+            Goto Salida
+         End
+
+      End
+
+   Begin Transaction
+      If @w_perAnt = 1
+         Begin
+
+--
+-- Traspaso de Polizas Anio a Poliza.
+--
+
+            Begin Try
+               Insert Into dbo.PolizaHist
+              (Referencia, Fecha_mov, Fecha_Cap,       Concepto,
+               Cargos,     Abonos,    TCons,           Usuario,
+               TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela,
+               Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
+               ejercicio,  mes)
+               Select Referencia, Fecha_Mov, Fecha_Cap,       Concepto,
+                      Cargos,     Abonos,    TCons,           Usuario,
+                      TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela,
+                      Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
+                      Ejercicio,  Mes
+               From   dbo.polizaAnio a With (Nolock)
+               Where  ejercicio  = @PnAnio
+               And    mes        = @PnMes
+               And    Not Exists ( Select Top 1 1
+                                   From   dbo.PolizaHist With (Nolock)
+                                   Where  Ejercicio  = a.ejercicio
+                                   And    mes        = a.mes
+                                   And    fecha_mov  = a.fecha_mov
+                                   And    Referencia = a.Referencia);
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+--
+-- Alta de los movimientos de las pólizas.
+--
+
+            Begin Try
+               Insert Into dbo.MovimientosHist
+              (Referencia,      Cons,             Moneda,        Fecha_mov,
+               Llave,           Concepto,         Importe,       Documento,
+               Clave,           FecCap,           Sector_id,     Sucursal_id,
+               Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+               TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+               mes)
+               Select Referencia,      Cons,             Moneda,        Fecha_mov,
+                      Llave,           Concepto,         Importe,       Documento,
+                      Clave,           FecCap,           Sector_id,     Sucursal_id,
+                      Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+                      TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+                      mes
+               From   dbo.MovimientosAnio a With (Nolock)
+               Where  ejercicio   = @PnAnio
+               And    mes         = @PnMes
+               And    Not Exists ( Select Top 1 1
+                                   From   dbo.MovimientosHist With (Nolock Index (IX_FK_MovimientosHistFk01))
+                                   Where  Referencia = a.Referencia
+                                   And    Cons       = a.cons
+                                   And    fecha_mov  = a.fecha_mov
+                                   And    Ejercicio  = a.ejercicio
+                                   And    mes        = a.mes)
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+         End
+      Else
+         Begin
+
+--
+-- Traspaso de Polizas Anio a Poliza.
+--
+
+            Begin Try
+               Insert Into dbo.Poliza
+              (Referencia, Fecha_mov, Fecha_Cap,       Concepto,
+               Cargos,     Abonos,    TCons,           Usuario,
+               TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela,
+               Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
+               ejercicio,  mes)
+               Select Referencia, Fecha_Mov, Fecha_Cap,       Concepto,
+                      Cargos,     Abonos,    TCons,           Usuario,
+                      TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela,
+                      Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
+                      Ejercicio,  Mes
+               From   dbo.polizaAnio a With (Nolock)
+               Where  ejercicio  = @PnAnio
+               And    mes        = @PnMes
+               And    Not Exists ( Select Top 1 1
+                                   From   dbo.Poliza With (Nolock)
+                                   Where  Ejercicio  = a.ejercicio
+                                   And    mes        = a.mes
+                                   And    fecha_mov  = a.fecha_mov
+                                   And    Referencia = a.Referencia);
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+--
+-- Alta de los movimientos de las pólizas.
+--
+
+            Begin Try
+               Insert Into dbo.Movimientos
+              (Referencia,      Cons,             Moneda,        Fecha_mov,
+               Llave,           Concepto,         Importe,       Documento,
+               Clave,           FecCap,           Sector_id,     Sucursal_id,
+               Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+               TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+               mes)
+               Select Referencia,      Cons,             Moneda,        Fecha_mov,
+                      Llave,           Concepto,         Importe,       Documento,
+                      Clave,           FecCap,           Sector_id,     Sucursal_id,
+                      Region_id,       Importe_Cargo,    Importe_Abono, Descripcion,
+                      TipoPolizaConta, ReferenciaFiscal, Fecha_Doc,     Ejercicio,
+                      mes
+               From   dbo.MovimientosAnio a With (Nolock)
+               Where  ejercicio   = @PnAnio
+               And    mes         = @PnMes
+               And    Not Exists ( Select Top 1 1
+                                   From   dbo.Movimientos With (Nolock Index (PK_Movimientos))
+                                   Where  Referencia = a.Referencia
+                                   And    Cons       = a.cons
+                                   And    fecha_mov  = a.fecha_mov
+                                   And    Ejercicio  = a.ejercicio
+                                   And    mes        = a.mes)
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+         End
+
+      While  @w_secuencia < @w_registros
+      Begin
+         Set @w_secuencia = @w_secuencia + 1
+         Select @w_anioProc = ejercicio,
+                @w_mesProc  = mes
+         From   #TempPeriodos
+         Where  secuencia = @w_secuencia
+         If @@Rowcount = 0
+            Begin
+               Break
+            End
+
+
+         Set @w_secCat = 0
+         While @w_secCat < @w_regCat
+         Begin
+            Set @w_secCat = @w_secCat + 1
+            Select @w_Llave  = Llave,
+                   @w_Moneda = moneda,
+                   @w_Car    = car,
+                   @w_Abo    = abo
+            From   #TempCatalogo
+            Where secuencia = @w_secCat;
+            If @@Rowcount = 0
+               Begin
+                  Break
+               End
+
+            If Not Exists ( Select Top 1 1
+                            From   dbo.Catalogo With (Nolock)
+                            Where  ejercicio = @w_anioProc
+                            And    mes       = @w_mesProc
+                            And    llave     = @w_Llave
+                            And    moneda    = @w_moneda)
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: La cuenta contable ', @w_llave, ' No existe en Catalogos para el períoodo; ', @w_anioProc, '-', Format(@w_mesProc, '00'));
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+            If Exists (Select Top 1 1
+	                   From   #TempCuentasResult
+                       Where  cuenta = Substring(@w_Llave, 1, 4))
+               Begin
+                  Goto Siguiente
+               End
+
+
+            If @PnAnio = @w_anioProc And
+               @PnMes  = @w_mesProc
+               Begin
+                  Begin Try
+                     Update dbo.catalogo
+                     Set    Car  = Car  + @w_Car,
+                            Abo  = Abo  + @w_Abo,
+                            SAct = SAnt + (Car + @w_Car) - (Abo + @w_Abo)
+                     Where  ejercicio = @w_anioProc
+                     And    mes       = @w_mesProc
+                     And    llave     = @w_Llave
+                     And    moneda    = @w_moneda;
+                  End Try
+
+                  Begin Catch
+                     Select  @w_Error      = @@Error,
+                             @w_linea      = Error_line(),
+                             @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                  End Catch
+
+                  If IsNull(@w_error, 0) <> 0
+                     Begin
+                        Rollback Transaction
+
+                        Select @PnEstatus = @w_error,
+                               @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                        Set Xact_Abort Off
+                        Goto Salida
+                     End
+               End
+            Else
+               Begin
+                  Begin Try
+                     Update dbo.catalogo
+                     Set    SAnt = SAnt + @w_Car - @w_Abo,
+                            SAct = SAct + @w_Car - @w_Abo
+                     Where  ejercicio = @w_anioProc
+                     And    mes       = @w_mesProc
+                     And    llave     = @w_Llave
+                     And    moneda    = @w_moneda;
+                  End Try
+
+                  Begin Catch
+                     Select  @w_Error      = @@Error,
+                             @w_linea      = Error_line(),
+                             @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                  End Catch
+
+                  If IsNull(@w_error, 0) <> 0
+                     Begin
+                        Rollback Transaction
+
+                        Select @PnEstatus = @w_error,
+                               @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                        Set Xact_Abort Off
+                        Goto Salida
+                     End
+               End
+
+         End
+
+         If @w_sucursable != 2
+            Begin
+               Goto Siguiente;
+            End
+
+         Set @w_secCatAux = 0
+         While @w_secCatAux < @w_regCatAux
+         Begin
+            Set @w_secCatAux      = @w_secCatAux + 1
+            Select @w_Llave       = Llave,
+                   @w_Moneda      = moneda,
+                   @w_Sector_id   = Sector_id,
+                   @w_sucursal_id = Sucursal_id,
+                   @w_Region_id   = Region_id,
+                   @w_Car         = car,
+                   @w_Abo         = abo
+            From   #TempCatalogoAux
+            Where secuencia = @w_secCat;
+            If @@Rowcount = 0
+               Begin
+                  Break
+               End
+
+            If @w_perAnt = 0
+               Begin
+                  If Exists (Select Top 1 1
+	                         From   #TempCuentasResult
+                             Where  cuenta = Substring(@w_Llave, 1, 4))
+                     Begin
+                        Goto Siguiente
+                     End
+
+                  If Not Exists ( Select Top 1 1
+                                  From   dbo.CatalogoAuxiliar With (Nolock)
+                                  Where  ejercicio   = @w_anioProc
+                                  And    mes         = @w_mesProc
+                                  And    llave       = @w_Llave
+                                  And    moneda      = @w_moneda
+                                  And    Sector_id   = @w_Sector_id
+                                  And    Sucursal_id = @w_sucursal_id
+                                  And    Region_id   = @w_Region_id)
+                     Begin
+                        Rollback Transaction
+
+                        Select @PnEstatus = 9999,
+                               @PsMensaje = Concat('Error.: La cuenta contable ', @w_llave, ' No existe en Catalogos Históricos para el períoodo; ', @w_anioProc, '-', Format(@w_mesProc, '00'));
+
+                        Set Xact_Abort Off
+                        Goto Salida
+                     End
+
+
+                  If @PnAnio = @w_anio And
+                     @PnMes  = @w_mes
+                     Begin
+                        Begin Try
+                           Update dbo.CatalogoAuxiliar
+                           Set    Car  = Car  + @w_Car,
+                                  Abo  = Abo  + @w_Abo,
+                                  SAct = SAnt + (Car + @w_Car) - (Abo + @w_Abo)
+                           Where  ejercicio   = @w_anioProc
+                           And    mes         = @w_mesProc
+                           And    llave       = @w_Llave
+                           And    moneda      = @w_moneda
+                           And    Sector_id   = @w_Sector_id
+                           And    Sucursal_id = @w_sucursal_id
+                           And    Region_id   = @w_Region_id;
+                        End Try
+
+                        Begin Catch
+                           Select  @w_Error      = @@Error,
+                                   @w_linea      = Error_line(),
+                                   @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                        End Catch
+
+                        If IsNull(@w_error, 0) <> 0
+                           Begin
+                              Rollback Transaction
+
+                              Select @PnEstatus = @w_error,
+                                     @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                              Set Xact_Abort Off
+                              Goto Salida
+                           End
+                     End
+                  Else
+                     Begin
+                        Begin Try
+                           Update dbo.CatalogoAuxiliar
+                           Set    SAnt = SAnt + @w_Car - @w_Abo,
+                                  SAct = SAct + @w_Car - @w_Abo
+                           Where  ejercicio   = @w_anioProc
+                           And    mes         = @w_mesProc
+                           And    llave       = @w_Llave
+                           And    moneda      = @w_moneda
+                           And    Sector_id   = @w_Sector_id
+                           And    Sucursal_id = @w_sucursal_id
+                           And    Region_id   = @w_Region_id;
+                        End Try
+
+                        Begin Catch
+                           Select  @w_Error      = @@Error,
+                                   @w_linea      = Error_line(),
+                                   @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                        End Catch
+
+                        If IsNull(@w_error, 0) <> 0
+                           Begin
+                              Rollback Transaction
+
+                              Select @PnEstatus = @w_error,
+                                     @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                              Set Xact_Abort Off
+                              Goto Salida
+                           End
+                     End
+               End
+            Else
+               Begin
+                  If Exists (Select Top 1 1
+	                         From   #TempCuentasResult
+                             Where  cuenta = Substring(@w_Llave, 1, 4))
+                     Begin
+                        Goto Siguiente
+                     End
+
+                  If Not Exists ( Select Top 1 1
+                                  From   dbo.CatalogoAuxiliarHist With (Nolock)
+                                  Where  ejercicio   = @w_anioProc
+                                  And    mes         = @w_mesProc
+                                  And    llave       = @w_Llave
+                                  And    moneda      = @w_moneda
+                                  And    Sector_id   = @w_Sector_id
+                                  And    Sucursal_id = @w_sucursal_id
+                                  And    Region_id   = @w_Region_id)
+                     Begin
+                        Rollback Transaction
+
+                        Select @PnEstatus = 9998,
+                               @PsMensaje = Concat('Error.: La cuenta contable ', @w_llave, ' No existe en Catalogos Históricos para el períoodo; ', @w_anioProc, '-', Format(@w_mesProc, '00'));
+
+                        Set Xact_Abort Off
+                        Goto Salida
+                     End
+
+
+                  If @PnAnio = @w_anio And
+                     @PnMes  = @w_mes
+                     Begin
+                        Begin Try
+                           Update dbo.CatalogoAuxiliarHist
+                           Set    Car  = Car  + @w_Car,
+                                  Abo  = Abo  + @w_Abo,
+                                  SAct = SAnt + (Car + @w_Car) - (Abo + @w_Abo)
+                           Where  ejercicio   = @w_anioProc
+                           And    mes         = @w_mesProc
+                           And    llave       = @w_Llave
+                           And    moneda      = @w_moneda
+                           And    Sector_id   = @w_Sector_id
+                           And    Sucursal_id = @w_sucursal_id
+                           And    Region_id   = @w_Region_id;
+                           Select @@Rowcount Hist
+                        End Try
+
+                        Begin Catch
+                           Select  @w_Error      = @@Error,
+                                   @w_linea      = Error_line(),
+                                   @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                        End Catch
+
+                        If IsNull(@w_error, 0) <> 0
+                           Begin
+                              Rollback Transaction
+
+                              Select @PnEstatus = @w_error,
+                                     @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                              Set Xact_Abort Off
+                              Goto Salida
+                           End
+                     End
+                  Else
+                     Begin
+                        Begin Try
+                           Update dbo.CatalogoAuxiliarHist
+                           Set    SAnt = SAnt + @w_Car - @w_Abo,
+                                  SAct = SAct + @w_Car - @w_Abo
+                           Where  ejercicio   = @w_anioProc
+                           And    mes         = @w_mesProc
+                           And    llave       = @w_Llave
+                           And    moneda      = @w_moneda
+                           And    Sector_id   = @w_Sector_id
+                           And    Sucursal_id = @w_sucursal_id
+                           And    Region_id   = @w_Region_id;
+                        End Try
+
+                        Begin Catch
+                           Select  @w_Error      = @@Error,
+                                   @w_linea      = Error_line(),
+                                   @w_desc_error = Substring (Error_Message(), 1, 200)
+
+                        End Catch
+
+                        If IsNull(@w_error, 0) <> 0
+                           Begin
+                              Rollback Transaction
+
+                              Select @PnEstatus = @w_error,
+                                     @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                              Set Xact_Abort Off
+                              Goto Salida
+                           End
+                     End
+               End
+
+         End
+
+Siguiente:
+
+      End
+
+--
+-- Depuración del detalle de los movimientos contables
+--
+
+      If Exists ( Select Top 1 1
+                  From   dbo.MovimientosAnio With (Nolock)
+                  Where  ejercicio = @PnAnio
+                  And    mes       = @PnMes)
+         Begin
+            Begin Try
+               Delete dbo.MovimientosAnio
+               Where  ejercicio = @PnAnio
+               And    mes       = @PnMes;
+
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+         End
+
+--
+-- Depuración del Cabecero de los movimientos contables
+--
+
+      If Exists ( Select Top 1 1
+                  From   dbo.PolizaAnio With (Nolock)
+                  Where  ejercicio = @PnAnio
+                  And    mes       = @PnMes)
+         Begin
+            Begin Try
+               Delete dbo.PolizaAnio
+               Where  ejercicio = @PnAnio
+               And    mes       = @PnMes;
+
+            End Try
+
+            Begin Catch
+               Select  @w_Error      = @@Error,
+                       @w_linea      = Error_line(),
+                       @w_desc_error = Substring (Error_Message(), 1, 200)
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Rollback Transaction
+
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Set Xact_Abort Off
+                  Goto Salida
+               End
+
+         End
+
+--
+-- Fin del proceso.
+--
+
+   Commit Transaction
+
+Salida:
+
+   Set Xact_Abort Off
+   Return
+
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 
+--
+-- Comentarios.
+--
+
+Declare
+   @w_valor          Varchar(1500) = 'Ajusta los saldos contables posterior al cierre',
+   @w_procedimiento  Varchar( 100) = 'Spp_AjustaSaldosMes'
+
+
+If Not Exists (Select Top 1 1
+               From   sys.extended_properties a
+               Join   sysobjects  b
+               On     b.xtype   = 'P'
+               And    b.name    = @w_procedimiento
+               And    b.id      = a.major_id)
+
+   Begin
+      Execute  sp_addextendedproperty @name       = N'MS_Description',
+                                      @value      = @w_valor,
+                                      @level0type = 'Schema',
+                                      @level0name = N'Dbo',
+                                      @level1type = 'Procedure',
+                                      @level1name = @w_procedimiento;
+
+   End
+Else
+   Begin
+      Execute sp_updateextendedproperty @name       = 'MS_Description',
+                                        @value      = @w_valor,
+                                        @level0type = 'Schema',
+                                        @level0name = N'Dbo',
+                                        @level1type = 'Procedure',
+                                        @level1name = @w_procedimiento
+   End
+1> 

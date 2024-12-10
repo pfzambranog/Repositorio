@@ -1,0 +1,20 @@
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\1.- Spc_valida_longitud.sql"             > mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\2.- Spc_Lista_Det_Tablas.sql"           >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\3.- spc_busca_campos.sql"               >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\4.- Spc_AnalisisTabla.sql"              >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\5.- Spc_lista_dim_tablas.sql"           >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\6.- spc_Lista_Det_Procedimientos.sql"   >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\7.- Spc_Lista_Param_Procedimientos.sql" >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\8.- Spc_Lista_Det_Funciones.sql"        >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\9.- Spc_Lista_Det_Triggers.sql"         >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\10.- Spc_Lista_Det_Vistas.sql"          >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\11.- Spc_catPaisesTbl.sql"              >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\12.- Spc_catEstadosTbl.sql"             >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\13.- Spc_catMunicipiosTbl.sql"          >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\14.- Spc_catColoniasTbl.sql"            >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\15.- Spc_catCiudadesTbl.sql"            >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\16.- Spc_catCodigosPostalesTbl.sql"     >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\17.- Spc_catCriteriosTbl.sql"           >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\18.- Spc_catGeneralesTbl.sql"           >> mgrProcedimientosGrales.log
+osql -S %1 -d %2 -E  -e -i ".\4.- Procedimientos Grales\19.- Spu_catGeneralesTbl.sql"           >> mgrProcedimientosGrales.log
+

@@ -1,0 +1,158 @@
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> Create Or Alter Trigger dbo.TrinscatGeneralesTbl  
+On     dbo.catGeneralesTbl  
+After Insert, Update  
+As  
+  
+Declare   
+  @w_tabla               Sysname,  
+  @w_columna             Sysname,  
+  @w_id                  Integer  
+  
+Begin  
+     
+   Select  @w_tabla           = tabla,  
+           @w_columna         = columna  
+   From   Inserted  
+  
+   Select @w_id = id  
+   From   Sysobjects  
+   Where  Uid  = 1  
+   And    Type = 'U'  
+   And    Name = @w_tabla  
+   If @@Rowcount = 0  
+      Begin  
+         Raiserror ('El Código de la Tabla Seleccionada no es Válido.', 16, 1)       
+         Rollback Transaction  
+         Return  
+      End  
+  
+   If Not Exists ( Select Top 1 1  
+                   From   Sys.Columns  
+                   Where  Object_id = @w_id  
+                   And    Name      = @w_columna)  
+      Begin  
+         Raiserror ('El Código de la Columna Seleccionada no es Válido para a Tabla Seleccionada.', 16, 1)       
+         Rollback Transaction  
+      End  
+  
+  Return  
+End  
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 
+--
+-- Comentarios.
+--
+
+Execute sp_addextendedproperty    @name       = N'MS_Description',
+                                  @value      = N'Valida el registro a actualizar en la tabla catGeneralesTbl.',
+                                  @level0type = 'Schema',
+                                  @level0name = N'dbo',
+                                  @level1type = N'Table',
+                                  @level1name = N'catGeneralesTbl',
+                                  @level2type = 'Trigger',
+                                  @level2name = N'TrinscatGeneralesTbl'
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> Create Or Alter Trigger dbo.TrinsControl
+On     dbo.Control
+After Insert, Update
+As
+
+Declare
+  @w_contador              Integer,
+  @w_ejercicio             Smallint,
+  @w_mes                   Tinyint,
+  @w_idEstatus             Bit;
+
+Begin
+
+   Select  @w_ejercicio = ejercicio,
+           @w_mes       = mes,
+           @w_idEstatus = idEstatus
+   From    Inserted
+   If @@Rowcount   = 0 Or
+      @w_idEstatus = 0
+      Begin
+         Return;
+      End
+
+   Select @w_contador = Count(1)
+   From   dbo.control
+   Where  idEstatus  = 1
+   If Isnull(@w_contador, 0) > 1
+      Begin
+         Raiserror ('Ya Existe un Registro con Estatus 1.', 16, 1)
+         Rollback Transaction
+         Return
+      End
+
+  Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 
+--
+-- Comentarios.
+--
+
+Execute sp_addextendedproperty    @name       = N'MS_Description',
+                                  @value      = N'Valida el registro a actualizar en la tabla control.',
+                                  @level0type = 'Schema',
+                                  @level0name = N'dbo',
+                                  @level1type = N'Table',
+                                  @level1name = N'control',
+                                  @level2type = 'Trigger',
+                                  @level2name = N'TrinsControl'
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 15> 16> 17> 18> 19> 20> 21> 22> 23> 24> 25> 26> 27> 28> 29> 30> 31> 32> 33> 34> 35> 36> 37> 38> 39> 40> 41> 42> 43> 44> 45> 46> Create Or Alter Trigger dbo.TrinsEjercicios
+On     dbo.Ejercicios
+After Insert, Update
+As
+
+Declare
+  @w_contador              Integer,
+  @w_ejercicio             Smallint,
+  @w_mes                   Tinyint,
+  @w_idEstatus             Bit;
+
+Begin
+
+   Select  @w_ejercicio = ejercicio,
+           @w_idEstatus = idEstatus
+   From    Inserted
+   If @@Rowcount   = 0 Or
+      @w_idEstatus = 0
+      Begin
+         Return;
+      End
+
+   If Not Exists ( Select Top 1 1
+                   From   dbo.catGeneralesTbl With (Nolock)
+                   Where  Tabla   = 'Ejercicios'
+                   And    columna = 'idEstatus'
+                   And    valor   = @w_idEstatus)
+      Begin
+         Raiserror ('El Estatus Seleccionado no es Válido.', 16, 1)
+         Rollback Transaction
+         Return
+      End
+
+   Select @w_contador = Count(1)
+   From   dbo.Ejercicios
+   Where  idEstatus  = 1
+   If Isnull(@w_contador, 0) > 1
+      Begin
+         Raiserror ('Ya Existe un Registro con Estatus 1.', 16, 1)
+         Rollback Transaction
+         Return
+      End
+
+  Return
+End
+1> 2> 3> 4> 5> 6> 7> 8> 9> 10> 11> 12> 13> 14> 
+--
+-- Comentarios.
+--
+
+Execute sp_addextendedproperty    @name       = N'MS_Description',
+                                  @value      = N'Valida el registro a actualizar en la tabla Ejercicios.',
+                                  @level0type = 'Schema',
+                                  @level0name = N'dbo',
+                                  @level1type = N'Table',
+                                  @level1name = N'Ejercicios',
+                                  @level2type = 'Trigger',
+                                  @level2name = N'TrinsEjercicios'
