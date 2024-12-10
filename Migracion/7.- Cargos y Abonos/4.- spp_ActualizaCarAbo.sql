@@ -379,7 +379,7 @@ Begin
       
    Execute dbo.Spp_AplicaPolizas @PnAnio      = @PnEjercicio,
                                  @PnIdMes     = @PnMes,
-                                 @PnmesCer    = @w_mesCer,
+                                 @PnMesCer    = @w_mesCer,
                                  @PsCondicion = @PsCondicion,
                                  @PnEstatus   = @PnEstatus Output,
                                  @PsMensaje   = @PsMensaje Output;

@@ -3,7 +3,7 @@
 -- Declare
    -- @PnAnio                Smallint            = 2024,
    -- @PnIdMes               Tinyint             = 7,
-   -- @PnmesCer              Integer             = 7,
+   -- @PnMesCer              Integer             = 7,
    -- @PsCondicion           Varchar(500)        = ' And Cast(P.Fecha_Mov As Date) Between ' + Char(39) + '2024-07-31' + + Char(39) + ' And ' + Char(39) + '2024-07-31' + Char(39),
    -- @PnEstatus             Integer             = 0,
    -- @PsMensaje             Varchar( 250)       = ' ' ;
@@ -11,7 +11,7 @@
 
    -- Execute dbo.Spp_AplicaPolizas @PnAnio      = @PnAnio,
                                  -- @PnIdMes     = @PnIdMes,
-                                 -- @PnmesCer    = @PnmesCer,
+                                 -- @PnMesCer    = @PnMesCer,
                                  -- @PsCondicion = @PsCondicion,
                                  -- @PnEstatus   = @PnEstatus Output,
                                  -- @PsMensaje   = @PsMensaje Output;
@@ -42,7 +42,7 @@
 Create Or Alter Procedure dbo.Spp_AplicaPolizas
    (@PnAnio              Smallint,
     @PnIdMes             Tinyint,
-    @PnmesCer            Integer           = 0,
+    @PnMesCer            Integer           = 0,
     @PsCondicion         Varchar(500),
     @PnEstatus           Integer           = 0    Output,
     @PsMensaje           Varchar( 250)     = ' '  Output)
@@ -304,7 +304,7 @@ Begin
 
 -- INICIO DE LA COMPARACION DEL MES, CUANDO CUMPLE CON LA CONDICION
 
-      If @PnIdMes = @PnmesCer
+      If @PnIdMes = @PnMesCer
          Begin
          --COMPARACION DE CLAVE SEA IGUAL A C
          --En SICCORP se manejan dos tipos de Clave.
@@ -358,12 +358,12 @@ Begin
                                             ' AboProceso    = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
                                        End
 
-            Set @w_sql = @w_sql + 'Where Llave       = ' + @w_comilla + @w_llave  + @w_comilla    + ' ' +
-                                  'And   Moneda      = ' + Convert(Varchar, @w_moneda_id)         + ' ' +
-                                  'And   Sucursal_id = ' + Convert(Varchar, @w_sucursal)          + ' ' +
-                                  'And   Sector_id   = ' + Convert(Varchar, @w_Sector)            + ' ' +
-                                  'And   Region_id   = ' + Convert(Varchar, @w_region)            + ' ' +
-                                  'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)              + ' ' +
+            Set @w_sql = @w_sql + 'Where Llave       = ' + @w_comilla + @w_llave       + @w_comilla    + ' ' +
+                                  'And   Moneda      = ' + @w_comilla + @w_moneda_id   + @w_comilla    + ' ' +
+                                  'And   Sucursal_id = ' + Convert(Varchar, @w_sucursal)               + ' ' +
+                                  'And   Sector_id   = ' + @w_comilla + @w_sector      + @w_comilla    + ' ' +
+                                  'And   Region_id   = ' + Convert(Varchar, @w_region)                 + ' ' +
+                                  'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)                   + ' ' +
                                   'And   mes         = ' + Convert(Varchar, @PnIdMes)
 
             Begin Try
@@ -411,8 +411,8 @@ Begin
                                                                          @w_comilla + @w_SubCta   + @w_comilla +' , ' +
                                                                          @w_comilla + @w_ctaMayor      + @w_comilla
                                                                End + ') ' +
-                                        'And   Moneda      = ' + Convert(Varchar, @w_moneda_id) + ' ' +
-                                        'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)      + ' ' +
+                                        'And   Moneda      = ' + @w_comilla + @w_moneda_id  + @w_comilla + ' ' +
+                                        'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)               + ' ' +
                                         'And   mes         = ' + Convert(Varchar, @PnIdMes)
                   
                   Begin Try
@@ -500,19 +500,19 @@ Begin
                                         'Where  Ejercicio   = ' + Cast(@PnAnio  As Varchar)              + ' ' +
                                         'And    mes         = ' + Cast(@PnIdMes As Varchar)              + ' '  +
                                         'And    Llave       = ' + @w_comilla + @w_llave     + @w_comilla + ' '  +
-                                        'And    Moneda_id   = ' + Cast(@w_moneda_id As Varchar)          + ' '  +
+                                        'And    Moneda_id   = ' + @w_comilla + @w_moneda_id + @w_comilla + ' '  +
                                         'And    Sector_id   = ' + @w_comilla + @w_sector + @w_comilla    + ' '  +
                                         'And    Sucursal_id = ' + Convert(Varchar, @w_sucursal)          + ' '  +
                                         'And    Region_id   = ' + Convert(Varchar, @w_region)            + ') ' +
                             'Begin '                                                                     +
-                               'Insert Into dbo.' + @w_catAuxReporte + ' '                                   +
+                               'Insert Into dbo.' + @w_catAuxReporte + ' '                               +
                               '(Ejercicio, Mes,       Llave,       moneda_id, '                          +
                                'nivel,     Sector_id, Sucursal_id, Region_id, '                          +
                                'SAct,      FecCap) '                                                     +
-                               'Select ' + Cast(@PnAnio As Varchar) + ', ' + Cast(@PnIdMes As Varchar)   + ', ' +
-                                           @w_comilla + @w_llave  + @w_comilla                           + ', ' +
-                                           Cast(@w_moneda_id As Varchar)   + ', 1 nivel, '               +
-                                           @w_comilla + @w_sector + @w_comilla                           + ', ' +                                                                                                             +
+                               'Select ' + Cast(@PnAnio As Varchar)  + ', ' + Cast(@PnIdMes As Varchar)  + ', ' +
+                                           @w_comilla + @w_llave     + @w_comilla                        + ', ' +
+                                           @w_comilla + @w_moneda_id + @w_comilla + ', 1 nivel, '        +
+                                           @w_comilla + @w_sector    + @w_comilla                        + ', ' +                                                                                                             +
                                            Cast(@w_sucursal As Varchar)                                  + ', ' +
                                            Cast(@w_region   As Varchar)                                  + ', ' +
                                            Cast(@w_importe  As Varchar)                                  + ', ' +
@@ -524,12 +524,12 @@ Begin
                                'Set   SAct = SAct + ' + Case When @w_clave = 'C'
                                                              Then Convert(Varchar, @w_importe)
                                                              Else Convert(Varchar, -@w_importe)
-                                                         End + ' ' +
+                                                         End                                             + ' '   +
                                'Where  Ejercicio   = ' + Cast(@Pnanio  As Varchar)                       + ' '   +
                                'And    mes         = ' + Cast(@PnIdMes As Varchar)                       + ' '   +
                                'And    Llave       = ' + @w_comilla + @w_llave     + @w_comilla          + ' '   +
-                               'And    Moneda_id   = ' + Cast(@w_moneda_id As Varchar)                   + ' '   +
-                               'And    Sector_id   = ' + @w_comilla + @w_sector + @w_comilla             + ' '   +
+                               'And    Moneda_id   = ' + @w_comilla + @w_moneda_id + @w_comilla          + ' '   +
+                               'And    Sector_id   = ' + @w_comilla + @w_sector    + @w_comilla          + ' '   +
                                'And    Sucursal_id = ' + Convert(Varchar, @w_sucursal)                   + ' '   +
                                'And    Region_id   = ' + Convert(Varchar, @w_region)                     + ' '   +
                         'End '
@@ -566,12 +566,12 @@ Begin
                                             'AboProceso = AboProceso + ' + Convert(Varchar, @w_importe)
                                   End + ' '
 
-            Set @w_sql = @w_sql + 'Where Llave       = ' + @w_comilla + @w_llave  + @w_comilla    + ' ' +
-                                  'And   Moneda      = ' + Convert(Varchar, @w_moneda_id)         + ' ' +
-                                  'And   Sucursal_id = ' + Convert(Varchar, @w_sucursal)          + ' ' +
-                                  'And   Sector_id   = ' + Convert(Varchar, @w_Sector)            + ' ' +
-                                  'And   Region_id   = ' + Convert(Varchar, @w_region)            + ' ' +
-                                  'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)              + ' ' +
+            Set @w_sql = @w_sql + 'Where Llave       = ' + @w_comilla + @w_llave      + @w_comilla + ' ' +
+                                  'And   Moneda      = ' + @w_comilla + @w_moneda_id  + @w_comilla + ' ' +
+                                  'And   Sucursal_id = ' + Convert(Varchar, @w_sucursal)           + ' ' +
+                                  'And   Sector_id   = ' + @w_comilla + @w_Sector     + @w_comilla + ' ' +
+                                  'And   Region_id   = ' + Convert(Varchar, @w_region)             + ' ' +
+                                  'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)               + ' ' +
                                   'And   mes         = ' + Convert(Varchar, @PnIdMes)
 
             Begin try
@@ -603,18 +603,18 @@ Begin
                                         'Where  Ejercicio   = '   + Cast(@PnAnio  As Varchar)              + ' ' +
                                         'And    mes         = '   + Cast(@PnIdMes As Varchar)              + ' '  +
                                         'And    Llave       = '   + @w_comilla + @w_llave     + @w_comilla + ' '  +
-                                        'And    Moneda_id   = '   + Cast(@w_moneda_id As Varchar)          + ' '  +
+                                        'And    Moneda_id   = '   + @w_comilla + @w_moneda_id + @w_comilla + ' '  +
                                         'And    Sector_id   = '   + @w_comilla + '00' + @w_comilla         + ' '  +
                                         'And    Sucursal_id = 0 '                                          +
-                                        'And    Region_id   = 0) '                                          +
+                                        'And    Region_id   = 0) '                                         +
                             'Begin  '                                                                                                                       +
-                               'Insert Into dbo.' + @w_catAuxReporte + ' '                                   +
+                               'Insert Into dbo.' + @w_catAuxReporte + ' '                                +
                               '(Ejercicio, Mes,       Llave,       moneda_id, '                          +
                                'nivel,     Sector_id, Sucursal_id, Region_id, '                          +
                                'SAct,      FecCap) '                                                     +
                                'Select ' + Cast(@PnAnio As Varchar) + ', ' + Cast(@PnIdMes As Varchar)   + ', ' +
                                            @w_comilla + @w_llave  + @w_comilla                           + ', ' +
-                                           Cast(@w_moneda_id As Varchar)   + ', 1 nivel, '               +
+                                           @w_comilla + @w_moneda_id + @w_comilla  + ', 1 nivel, '       +
                                            @w_comilla + '00' + @w_comilla                                + ', ' +                                                                                                             +
                                            '0 sucursal, 0 region, '                                      + ' '  +
                                            Cast(@w_importe  As Varchar)                                  + ', ' +
@@ -630,7 +630,7 @@ Begin
                                'Where  Ejercicio   = ' + Cast(@Pnanio  As Varchar)                       + ' '   +
                                'And    mes         = ' + Cast(@PnIdMes As Varchar)                       + ' '   +
                                'And    Llave       = ' + @w_comilla + @w_llave     + @w_comilla          + ' '   +
-                               'And    Moneda_id   = ' + Cast(@w_moneda_id As Varchar)                   + ' '   +
+                               'And    Moneda_id   = ' + @w_comilla + @w_moneda_id + @w_comilla          + ' '   +
                                'And    Sector_id   = ' + @w_comilla + '00' + @w_comilla                  + ' '  +
                                'And    Sucursal_id = 0 '                                                 +
                                'And    Region_id   = 0 '                                                 +
@@ -672,9 +672,9 @@ Begin
 
             Set @w_sql = @w_sql + 'Where ejercicio   = ' + Cast(@PnAnio  As VarChar)              + ' ' +
                                   'And   mes         = ' + Cast(@PnIdMes As Varchar)              + ' ' +
-                                  'And   Llave       = ' + @w_comilla + @w_llave + @w_comilla     + ' ' +
-                                  'And   Moneda      = ' + Cast(@w_moneda_id As Varchar)          + ' ' +
-                                  'And   Sector_id   = ' + @w_comilla + '00' + @w_comilla         + ' '  +
+                                  'And   Llave       = ' + @w_comilla + @w_llave     + @w_comilla + ' ' +
+                                  'And   Moneda      = ' + @w_comilla + @w_moneda_id + @w_comilla + ' ' +
+                                  'And   Sector_id   = ' + @w_comilla + '00'         + @w_comilla + ' ' +
                                   'And   Sucursal_id =  0 '                                       +
                                   'And   Region_id   =  0 '
 
@@ -709,19 +709,19 @@ Begin
 --
 
             Set @w_sql = 'If Not Exists ( Select Top 1 1 '  +
-                                         'From   dbo.' + @w_catReporte + ' With (Nolock) '             +
-                                         'Where  ejercicio = '    + Cast(@PnAnio      As Varchar) + ' ' +
-                                         'And    mes       = '    + Cast(@PnIdMes     As Varchar) + ' ' +
-                                         'And    Llave     = '    + @w_comilla + @w_llave + @w_comilla  + ' ' +
-                                         'And    moneda_id = '    + Cast(@w_moneda_id As Varchar)       + ' ' +
+                                         'From   dbo.' + @w_catReporte + ' With (Nolock) '                 +
+                                         'Where  ejercicio = '    + Cast(@PnAnio      As Varchar)          + ' ' +
+                                         'And    mes       = '    + Cast(@PnIdMes     As Varchar)          + ' ' +
+                                         'And    Llave     = '    + @w_comilla + @w_llave     + @w_comilla + ' ' +
+                                         'And    moneda_id = '    + @w_comilla + @w_moneda_id + @w_comilla + ' ' +
                                          'And    nivel     = 1) ' +
                             'Begin ' +
                                'Insert Into dbo.' + @w_catReporte                 +
                                '(Ejercicio, Mes, Llave, moneda_id, nivel, SAct) ' +
                                'Select ' + Cast(@PnAnio      As Varchar) + ', '   +
                                            Cast(@PnIdMes     As Varchar) + ', '   +
-                                           @w_comilla + @w_llave + @w_comilla     + ', ' +
-                                           Cast(@w_moneda_id As Varchar) + ', 1, ' +
+                                           @w_comilla + @w_llave     + @w_comilla + ', ' +
+                                           @w_comilla + @w_moneda_id + @w_comilla + ', 1, ' +
                                            Cast(@w_importe As Varchar)            + ' ' +
                             'End '                                                                                              +
                          'Else '                                                                                                +
@@ -732,10 +732,10 @@ Begin
                                                             Then Cast(@w_importe  As Varchar)
                                                             Else Cast(-@w_importe As Varchar)
                                                           End + ' ' +
-                               'Where  ejercicio = '   + Cast(@PnAnio      As Varchar) + ' ' +
-                               'And    mes       = '   + Cast(@PnIdMes     As Varchar) + ' ' +
-                               'And    Llave     = '   + @w_comilla + @w_llave + @w_comilla  + ' ' +
-                               'And    moneda_id = '   + Cast(@w_moneda_id As Varchar)       + ' ' +
+                               'Where  ejercicio = '   + Cast(@PnAnio      As Varchar)          + ' ' +
+                               'And    mes       = '   + Cast(@PnIdMes     As Varchar)          + ' ' +
+                               'And    Llave     = '   + @w_comilla + @w_llave     + @w_comilla + ' ' +
+                               'And    moneda_id = '   + @w_comilla + @w_moneda_id + @w_comilla + ' ' +
                            'End'
 
             Begin try
@@ -754,6 +754,7 @@ Begin
                   Select @PnEstatus = @w_error,
                          @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
 
+Select @w_sql
                   Insert Into dbo.Bitacora_CargosAbonos
                   (mensaje, idError, mensajeError, ultactual )
                   Values ('ERROR 20', @w_error, @w_desc_error, @w_fechaCaptura);

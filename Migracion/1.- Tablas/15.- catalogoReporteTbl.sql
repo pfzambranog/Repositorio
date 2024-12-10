@@ -17,10 +17,13 @@ Create Table dbo.catalogoReporteTbl
    SAct            Decimal(18, 2)  Not Null Default 0,
    FecCap          Datetime        Not Null Default GetDate(),
 Constraint catalogoReportePk
-Primary Key (Ejercicio, mes, Llave, moneda_id, nivel),
-Constraint catalogoReporteFk01
-Foreign Key (llave, moneda_id)
-References dbo.CatalogoConsolidado(numerodecuenta, moneda_id))
+Primary Key (Ejercicio, mes, Llave, moneda_id, nivel))
+
+
+-- Constraint catalogoReporteFk01
+-- Foreign Key (llave, moneda_id)
+-- References dbo.CatalogoConsolidado(numerodecuenta, moneda_id))
+
 
 --
 -- Comentarios
@@ -56,10 +59,12 @@ Create Table dbo.catalogoAuxReporteTbl
    SAct            Decimal(18, 2)  Not Null Default 0,
    FecCap          Datetime        Not Null Default GetDate(),
 Constraint catalogoAuxReportePk
-Primary Key (Ejercicio, mes, Llave, Moneda_id, nivel, Sector_id, Sucursal_id, Region_id),
-Constraint catalogoReporteAuxFk01
-Foreign Key (llave, moneda_id)
-References dbo.CatalogoConsolidado(numerodecuenta, moneda_id))
+Primary Key (Ejercicio, mes, Llave, Moneda_id, nivel, Sector_id, Sucursal_id, Region_id))
+
+
+-- Constraint catalogoReporteAuxFk01
+-- Foreign Key (llave, moneda_id)
+-- References dbo.CatalogoConsolidado(numerodecuenta, moneda_id))
 
 --
 -- Comentarios
