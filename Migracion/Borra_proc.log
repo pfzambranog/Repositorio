@@ -1,3 +1,0 @@
-Drop Procedure dbo.Spp_GeneraBd 
-Drop Procedure dbo.Spp_RecuperaBd 
-Drop Procedure dbo.Spp_AsignaPermisos 
