@@ -106,7 +106,7 @@ Begin
                     @w_tabla       = Case When @w_mes = 0
                                           Then Concat('catIni', @w_anioIni)
                                           When @w_mes = 13
-                                          Then Concat('catFin', @w_anioIni)
+                                          Then Concat('catCie', @w_anioIni)
                                           Else Concat('cat', @w_chmes, @w_anioIni)
                                      End;
 

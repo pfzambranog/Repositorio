@@ -7,7 +7,7 @@ Begin
     Declare
        @w_salida   Varchar(15)
 
-       Select @w_salida = Substring(descripcion, 1, 3)
+       Select @w_salida = valorAdicional
        From   dbo.catCriteriosTbl
        Where  criterio = 'mes'
        And    valor    = @intMes

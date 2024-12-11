@@ -94,7 +94,7 @@ Begin
 
          End
 
-      While @w_mes < 12
+      While @w_mes < 13
       Begin
          Select @w_mes   = @w_mes + 1,
                 @w_chmes = dbo.Fn_BuscaMes (@w_mes),

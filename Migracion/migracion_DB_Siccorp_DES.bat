@@ -1,8 +1,8 @@
 @echo off
 
-set serv=localhost
+set serv=192.168.99.1
 set db=DB_Siccorp_DES
-Set dir=C:\BaseDatos\DB_Siccorp_DES\
+Set dir=C:\MSSQL\Data
 Set dir1=%CD%
 set dbTemp=tempdb
 
@@ -29,8 +29,6 @@ call "C:\Program Files\WinRAR\unrar.exe" e ServicioPostal.rar
 rem Generacion de Base de datos y Tablas.
 
 Call ".\1.- Tablas\mgrTablas.bat" %serv% %db% %dbTemp% %dir% %dir1% 
-
-
 
 rem Generación de Disparadores.
 
@@ -80,8 +78,16 @@ rem Ajuste Cierre
 
 Call ".\11.- Ajuste Cierre\Ajuste Cierre.bat" %serv% %db%
 
+rem Validaciones de migración
+
+Call ".\12.- Validacion Migracion\mgrValidacion.bat" %serv% %db% 
+
+rem Borrado del archivo de ServicioPostal
 
 If Exist ServicioPostal.bak    del ServicioPostal.bak
+
+If Exist ServicioPostal.rar    del ServicioPostal.rar
+
 
 rem Borra archivos sql
 
