@@ -16,10 +16,12 @@ Begin
    Set Xact_Abort    On
 
    Select @w_mes       = 0,
-          @w_anioIni   = 2017,
-          @w_anioFin   = 2024,
           @w_comilla   = Char(39),
           @w_registros = 0;
+
+   Select @w_anioIni  = Datepart(yyyy, parametroFecha) - 1
+   From   dbo.conParametrosGralesTbl With (Nolock)
+   Where  idParametroGral = 11;
 
    Select @w_anioFin = ejercicio
    From   dbo.Control With  (Nolock)
@@ -30,7 +32,7 @@ Begin
                  @w_desc_error = 'Error: No hay Ejercicios en Estatus 1 en la tabla control.'
 
          Set Xact_Abort Off
-         Goto Salida
+         Return
       End
 
    Begin Transaction
@@ -38,8 +40,8 @@ Begin
                   From   dbo.PolizaAnio)
          Begin
             Begin Try
-               Delete dbo.MovimientosAnio
-               Delete dbo.PolizaAnio
+               truncate table dbo.MovimientosAnio
+               Delete         dbo.PolizaAnio
             End Try
 
             Begin Catch
@@ -59,18 +61,18 @@ Begin
 
          End
 
-      While @w_anioIni  < @w_anioFin
+      While @w_anioIni < @w_anioFin
       Begin
-         Select @w_mes     = 0,
-                @w_anioIni = @w_anioIni + 1,
-                @w_tabla = Concat('movDia', @w_anioIni);
+
+         Select @w_anioIni = @w_anioIni + 1,
+                @w_tabla  = Concat('MovDia', @w_anioIni)
 
          If Ejercicio_DES.dbo.Fn_existe_tabla( @w_tabla ) = 0
             Begin
                Goto Siguiente
             End
 
-         Set @w_sql = Concat('Select Distinct Referencia, Fecha_mov, Fecha_Cap,       Concepto, ',
+         Set @w_sql = Concat('Select Referencia, Fecha_mov, Fecha_Cap,       Concepto, ',
                                     'Cargos,     Abonos,    TCons,           Usuario, ',
                                     'TipoPoliza, Documento, Usuario_cancela, Fecha_Cancela, ',
                                     'Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos, ',
@@ -85,7 +87,7 @@ Begin
              Status,     Mes_Mov,   TipoPolizaConta, FuenteDatos,
              ejercicio,  mes)
             Execute(@w_sql)
-         
+
             Set @w_registros = @w_registros + @@Rowcount;
 
          End Try
@@ -94,14 +96,14 @@ Begin
             Select  @w_Error      = @@Error,
                     @w_linea      = Error_line(),
                     @w_desc_error = Substring (Error_Message(), 1, 200)
-         
+
          End   Catch
-         
+
          If @w_error != 0
             Begin
                Select @w_error, @w_desc_error;
                RollBack Transaction
-         
+
                Goto Salida
             End
 

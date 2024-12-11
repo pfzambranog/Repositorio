@@ -23,9 +23,12 @@ Begin
    Set Xact_Abort    On
 
    Select @w_mes       = 13,
-          @w_anioIni   = 2017,
           @w_comilla   = Char(39),
           @w_registros = 0;
+
+   Select @w_anioIni  = Datepart(yyyy, parametroFecha) - 1
+   From   dbo.conParametrosGralesTbl With (Nolock)
+   Where  idParametroGral = 11;
 
    Select @w_anioFin = ejercicio
    From   dbo.Control With  (Nolock)
@@ -92,7 +95,7 @@ Begin
       While @w_anioIni  < @w_anioFin
       Begin
          Select @w_anioIni = @w_anioIni + 1,
-                @w_tabla = Concat('PolDia', @w_chmes, @w_anioIni);
+                @w_tabla = Concat('PolDia', @w_anioIni);
 
          If Ejercicio_DES.dbo.Fn_existe_tabla( @w_tabla ) = 0
             Begin
