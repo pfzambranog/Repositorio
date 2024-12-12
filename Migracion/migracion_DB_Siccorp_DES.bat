@@ -69,9 +69,9 @@ Call ".\10.- Procedimientos\Procedimientos.bat" %serv% %db%
 
 rem Borra Bd ServicioPostal
  
-osql -S  %serv% -d %dbTemp% -U %usr%  -P %pass% -E -e -i Sp_BorraBd.sql                      > Sp_BorraBd.log
+osql -S  %serv% -d %dbTemp% -E -e -i Sp_BorraBd.sql                      > Sp_BorraBd.log
 
-osql -S  %serv% -d %dbTemp% -U %usr%  -P %pass% -E -e -Q "Drop Procedure dbo.Spp_BorraBd "  >>  Borra_proc.log
+osql -S  %serv% -d %dbTemp% -E -e -Q "Drop Procedure dbo.Spp_BorraBd "   >  Borra_proc.log
 
 
 rem Ajuste Cierre
