@@ -1,0 +1,25 @@
+--
+-- Ejecución del Procedimiento de solicitud de notificación, que indica hasta que fecha esta disponible los datos del periodo actual.
+--
+
+Declare
+   @PnIdMotivo                Integer       = 1018,
+   @PnIdTipoNotificacion      Tinyint       = 1,
+   @PsParametros              Varchar(4000) = 'DBA_LIDER',
+   @PdFechaProgramada         Datetime      = Null,
+   @PnIdUsuarioAct            Integer       = 1,
+   @PnEstatus                 Integer       = 0,
+   @PsMensaje                 Varchar( 250) = ' ' 
+
+Begin
+   Execute dbo.Spa_conProcesosTbl @PnIdMotivo           = @PnIdMotivo,
+                                  @PnIdTipoNotificacion = @PnIdTipoNotificacion,
+                                  @PsParametros         = @PsParametros,
+                                  @PdFechaProgramada    = @PdFechaProgramada,
+                                  @PnIdUsuarioAct       = @PnIdUsuarioAct,
+                                  @PnEstatus            = @PnEstatus  Output,
+                                  @PsMensaje            = @PsMensaje  Output;
+
+    Select @PnEstatus;
+
+End

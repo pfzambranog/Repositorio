@@ -1,0 +1,5 @@
+--
+-- Comando de ejecución del procedimiento de Actualizacion de los Parametros para Reporte de Movimientos de control de cambio en la base de datos SGCCTI
+--
+
+Call sgccti.spp_movcontrolcambiosVw()

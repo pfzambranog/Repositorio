@@ -1,0 +1,1 @@
+Execute flyway.Spa_repParametrosFechaTbl @PnIdParam       = 1,@PdFechaInicio   = '2024-02-01', @PdFechaTermino  = '2024-02-29', @PsObservaciones = 'Reporte correspondiente al Periodo comprendido entre el 01-02-2024 y el 29-02-2024'

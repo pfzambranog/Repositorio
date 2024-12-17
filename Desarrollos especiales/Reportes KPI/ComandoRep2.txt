@@ -1,0 +1,6 @@
+--
+-- Comando de ejecución del procedimiento spp_ProcesaRepmovcontrolcambios, que actualiza los Parametros de fecha para el
+-- Reporte de Movimientos de control de cambio en la base de datos sgccti
+--
+
+call sgccti.spp_ProcesaRepmovcontrolcambios()

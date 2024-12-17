@@ -1,0 +1,11 @@
+--
+-- Genera comando de ejecución del procedimiento Spa_repParametrosFechaTbl, que actualiza los parametros de fecha en la Base de Datos NCTI.
+--
+
+SELECT Concat('Execute flyway.Spa_repParametrosFechaTbl ',
+                                         '@PnIdParam       = ', idParam, ',',
+                                         '@PdFechaInicio   = ', CHAR(39), fechaInicio,  CHAR(39), ', ',
+                                         '@PdFechaTermino  = ', CHAR(39), fechaTermino, CHAR(39), ', ',
+                                         '@PsObservaciones = ', CHAR(39), observaciones, CHAR(39))
+FROM   sgccti.repParametrosFechaTbl
+Where  idParam = 1
