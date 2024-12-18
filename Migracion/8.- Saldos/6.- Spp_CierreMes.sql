@@ -2,7 +2,7 @@
 
 -- Declare
    -- @PnAnio                Smallint            = 2024,
-   -- @PnMes                 Tinyint             = 13,
+   -- @PnMes                 Tinyint             = 6,
    -- @PsUsuario             Varchar(  10)       = Null,
    -- @PnEstatus             Integer             = 0,
    -- @PsMensaje             Varchar( 250)       = ' ' ;
@@ -188,6 +188,8 @@ Begin
 --
 -- Se actualiza los saldos de Catalogo
 --
+
+Select @PnAnio, @PnMes
 
    Execute dbo.Spp_actualizaSaldosMes @PnAnio      = @PnAnio,
                                       @PnMes       = @PnMes,
@@ -386,6 +388,7 @@ Begin
          Begin
             Select @w_mesProximo  = @PnMes + 1,
                    @w_anioProximo = @PnAnio
+
 --
             Begin Try
                Update dbo.control
@@ -522,10 +525,10 @@ Begin
          Nivel_sector, SProm2,     Sprom2Ant,  Ejercicio,
          Mes)
          Select Llave,           Moneda,       Niv,          Descrip,
-                SAct,            0 Car,        0 Abo,        SAct,
-                @w_fechaCaptura, 0 CarProceso, 0 AboProceso, CarProceso - AboProceso,
-                0 CarExt,        0 AboExt,     0 SProm,      SProm,
-                Nivel_sector,    0 SProm2,     Sprom2,       @w_anioProximo,
+                SAct SAnt,       0 Car,        0 Abo,        SAct,
+                @w_fechaCaptura, 0 CarProceso, 0 AboProceso, 0 SAntProceso,
+                0 CarExt,        0 AboExt,     0 SProm,      0 SPromAnt,
+                Nivel_sector,    0 SProm2,     0 Sprom2,     @w_anioProximo,
                 @w_mesProximo
          From   dbo.Catalogo With (Nolock)
          Where  ejercicio = @PnAnio
