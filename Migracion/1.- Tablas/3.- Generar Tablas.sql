@@ -290,15 +290,18 @@ If Object_id(N'dbo.FK_SubRangosFk01', 'F') Is Not Null
 Go
 
 If Object_id(N'dbo.RelSubRangos_DepartamentosFk01', 'F') Is Not Null
-    Alter Table dbo.RelSubRangos_DepartamentosTbl Drop Constraint RelSubRangos_DepartamentosFk01;
+    Alter Table dbo.RelSubRangos_DepartamentosTbl
+    Drop Constraint RelSubRangos_DepartamentosFk01;
 Go
 
 If Object_id(N'dbo.RelSubRangos_DepartamentosFk02', 'F') Is Not Null
-    Alter Table dbo.RelSubRangos_DepartamentosTbl Drop Constraint RelSubRangos_DepartamentosFk02;
+    Alter Table dbo.RelSubRangos_DepartamentosTbl 
+    Drop Constraint RelSubRangos_DepartamentosFk02;
 Go
 
 If Object_id(N'dbo.RelSubRangos_DepartamentosFk03', 'F') Is Not Null
-    Alter Table dbo.RelSubRangos_DepartamentosTbl Drop Constraint RelSubRangos_DepartamentosFk03;
+    Alter Table dbo.RelSubRangos_DepartamentosTbl 
+    Drop Constraint RelSubRangos_DepartamentosFk03;
 Go
 
 
@@ -1592,7 +1595,7 @@ Go
 
 Alter Table dbo.CatalogoAuxiliar
 Add Constraint PK_CatalogoAuxiliar
-    Primary Key Clustered (Llave, Moneda, Sucursal_id, Region_id, ejercicio, mes ASC);
+    Primary Key Clustered (Llave, Moneda, Sucursal_id, Region_id, ejercicio, mes, niv);
 Go
 
 Create Index catalogoAuxiliarIdx01 On catalogoAuxiliar (ejercicio, mes);
@@ -2041,35 +2044,35 @@ Go
 
 -- Creating Foreign Key On Llave, Moneda in Table 'Catalogo'
 
-Alter Table dbo.Catalogo
-Add Constraint FK_CatalogoFk01
-    Foreign Key (Llave, Moneda)
-    References dbo.CatalogoConsolidado
-        (numerodecuenta, moneda_id)
-    On Delete No Action On Update No Action;
-Go
+-- Alter Table dbo.Catalogo
+-- Add Constraint FK_CatalogoFk01
+    -- Foreign Key (Llave, Moneda)
+    -- References dbo.CatalogoConsolidado
+        -- (numerodecuenta, moneda_id)
+    -- On Delete No Action On Update No Action;
+-- Go
 
 
 
 -- Creating Foreign Key On Region_id, Sucursal_id in Table 'CatalogoAuxiliar'
 
-Alter Table dbo.CatalogoAuxiliar
-Add Constraint FK_CatalogoAuxiliarFk01
-    Foreign Key (Sucursal_id, Region_id)
-    References dbo.Departamento_o_Sucursal
-        (Sucursal_id, Region_id)
-    On Delete No Action On Update No Action;
-Go
+-- Alter Table dbo.CatalogoAuxiliar
+-- Add Constraint FK_CatalogoAuxiliarFk01
+    -- Foreign Key (Sucursal_id, Region_id)
+    -- References dbo.Departamento_o_Sucursal
+        -- (Sucursal_id, Region_id)
+    -- On Delete No Action On Update No Action;
+-- Go
 
 -- Creating Foreign Key On Llave, Moneda in Table 'CatalogoAuxiliar'
 
-Alter Table dbo.CatalogoAuxiliar
-Add Constraint FK_CatalogoAuxiliarFk03
-    Foreign Key (Llave, Moneda)
-    References dbo.CatalogoConsolidado
-        (numerodecuenta, moneda_id)
-    On Delete No Action On Update No Action;
-Go
+-- Alter Table dbo.CatalogoAuxiliar
+-- Add Constraint FK_CatalogoAuxiliarFk03
+    -- Foreign Key (Llave, Moneda)
+    -- References dbo.CatalogoConsolidado
+        -- (numerodecuenta, moneda_id)
+    -- On Delete No Action On Update No Action;
+-- Go
 
 -- Creating Foreign Key On Region_id, Sucursal_id in Table 'CatalogoAuxiliarCierre'
 
