@@ -33,4 +33,6 @@ osql -S %1 -d %2 -E -e -i ".\6.- Scripts\31.- Mgr_movimientosAnio.sql"          
 osql -S %1 -d %2 -E -e -i ".\6.- Scripts\32.- Mgr_CatalogoAuxiliarHist.sql"          >> mgrScripts.log
 osql -S %1 -d %2 -E -e -i ".\6.- Scripts\33.- Mgr_controlImpPolTbl.sql"              >> mgrScripts.log
 osql -S %1 -d %2 -E -e -i ".\6.- Scripts\34.- Relacion_Poliza_Interna_Externa.sql"   >> mgrScripts.log
+osql -S %1 -d %2 -E -e -i ".\6.- Scripts\35.- Depura Datos Historicos.sql"           >> mgrScripts.log
+
 
