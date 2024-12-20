@@ -261,16 +261,18 @@ Begin
           CarExt,       AboExt,     SProm,      SPromAnt,
           Nivel_sector, SProm2,     Sprom2Ant,  Ejercicio,
           Mes)
-          Select Llave,        Moneda,       Niv,          Descrip,
-                 SAct,         0 Car,        0 Abo,        SAct,
-                 FecCap,       0 CarProceso, 0 AboProceso, 0 SAntProceso,
-                 0 CarExt,     0 AboExt,     0 SProm,      0 SPromAnt,
-                 Nivel_sector, 0 SProm2,     0 Sprom2Ant,  @PnAnio,
+          Select Llave,          Moneda,       Niv,          Descrip,
+                 SAct,           0 Car,        0 Abo,        SAct,
+                 FecCap,         0 CarProceso, 0 AboProceso, 0 SAntProceso,
+                 0 CarExt,       0 AboExt,     0 SProm,      0 SPromAnt,
+                 1 Nivel_sector, 0 SProm2,     0 Sprom2Ant,  @PnAnio,
                  @PnMes
-          From   dbo.Catalogo a With (Nolock)
-          Where  ejercicio = @w_anioAnterior
-          And    mes       = @w_mesAnterior
-          And    Niv       = 1;
+          From   dbo.CatalogoAuxiliar a With (Nolock)
+          Where  ejercicio   = @w_anioAnterior
+          And    mes         = @w_mesAnterior
+          And    Sucursal_id = 0
+          And    Niv         = 1;
+
       End Try
 
       Begin Catch
@@ -331,8 +333,8 @@ Begin
          CarProceso,  AboProceso, SAntProceso, CarExt,
          AboExt,      SProm,      SPromAnt,    SProm2,
          SProm2Ant,   ejercicio,  mes)
-         Select Llave,         Moneda,       Niv,         Sector_id,
-                Sucursal_id,   Region_id,    Descrip,     SAct,
+         Select Llave,         Moneda,       Niv,           Sector_id,
+                Sucursal_id,   Region_id,    Descrip,       SAct,
                 0 Car,         0 Abo,        SAct,          FecCap,
                 0 CarProceso,  0 AboProceso, 0 SAntProceso, 0 CarExt,
                 0 AboExt,      0 SProm,      0 SPromAnt,    0 SProm2,
@@ -361,7 +363,6 @@ Begin
             Goto Salida
          End
          
-      
 --
 -- Traspaso de Polizas Anio a Poliza.
 --
@@ -510,42 +511,42 @@ Begin
         (Llave, Moneda,      Niv,          Car,
          Abo,   CarProceso,  AboProceso,   ejercicio,
          mes)
-         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 3 Niv,
+         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 2 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv         = 1
          Group  By Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, a.ejercicio, a.mes
          Union
-         Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 4 Niv,
+         Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 3 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv          = 1
          Group  By Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, a.ejercicio, a.mes
          Union
-         Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 5 Niv,
+         Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 4 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv           = 1
          Group  By Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, a.ejercicio, a.mes
          Union
-         Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 6 Niv,
+         Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 5 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv           = 1
          Group  By Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, a.ejercicio, a.mes
          Union
-         Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 7 Niv,
+         Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 6 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv           = 1
          Group  By Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, a.ejercicio, a.mes
          Union
-         Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 8 Niv,
+         Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 7 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
@@ -796,10 +797,10 @@ Begin
          From   #TempCatalogoAux a
          Where  Not Exists ( Select Top 1 1
                              From   dbo.CatalogoAuxiliar With (Nolock)
-                             Where  ejercicio = a.ejercicio
-                             And    mes       = a.mes
-                             And    llave     = a.llave
-                             And    moneda    = a.moneda
+                             Where  ejercicio   = a.ejercicio
+                             And    mes         = a.mes
+                             And    llave       = a.llave
+                             And    moneda      = a.moneda
                              And    Sucursal_id = a.Sucursal_id
                              And    Region_id   = a.Region_id)
 
@@ -823,6 +824,7 @@ Begin
          Where  a.ejercicio    = @PnAnio
          And    a.mes          = @PnMes
          And    a.Sucursal_id  = 0;
+         
 
          Insert Into dbo.CatalogoAuxiliar
         (Llave,       Moneda,     Niv,         Sector_id,
@@ -848,7 +850,8 @@ Begin
 					              And    b.llave        = a.llave
                                   And    b.Sucursal_id  = 0)
          Group By Llave, Moneda, Niv;
-                    
+
+                  
       End Try
 
       Begin Catch
@@ -964,6 +967,10 @@ Begin
                   And    mes       = @PnMes)
          Begin
             Begin Try
+               Delete dbo.MovimientoAnio
+               Where  ejercicio = @PnAnio
+               And    mes       = @PnMes;
+
                Delete dbo.PolizaAnio
                Where  ejercicio = @PnAnio
                And    mes       = @PnMes;
