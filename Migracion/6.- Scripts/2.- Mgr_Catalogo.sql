@@ -104,10 +104,10 @@ Begin
              Select @w_registrosDup = 0,
                     @w_chmes        = dbo.Fn_BuscaMes (@w_mes),
                     @w_tabla        = Case When @w_mes = 0
-                                          Then Concat('CatAuxIni', @w_anioIni)
+                                          Then Concat('CatIni', @w_anioIni)
                                           When @w_mes = 13
-                                          Then Concat('CatAuxCie', @w_anioIni)
-                                          Else Concat('CatAux', @w_chmes, @w_anioIni)
+                                          Then Concat('CatCie', @w_anioIni)
+                                          Else Concat('Cat', @w_chmes, @w_anioIni)
                                      End;
 
              If Ejercicio_DES.dbo.Fn_existe_tabla( @w_tabla ) = 0
@@ -122,12 +122,7 @@ Begin
                                         'Nivel_sector, SProm2,     SProm2Ant, ',
                                          @w_anioIni, ', ', @w_mes, ' ',
                                  'From   Ejercicio_DES.dbo.', @w_tabla, ' a ',
-                                 'Where  Niv In (0, 1) ',
-                                 'And    Sucursal_id = 0 '
-                                 'And    Exists (Select Top 1 1 ',
-                                                'From   dbo.catalogoConsolidado ',
-                                                'Where  numerodecuenta = a.Llave ',
-                                                'And    moneda_id      = ', @w_comilla, '00', @w_comilla, ')')
+                                 'Where  Niv         = 1 ')
              Begin Try
                 Insert Into dbo.Catalogo
                (Llave,        Moneda,     Niv,        Descrip,

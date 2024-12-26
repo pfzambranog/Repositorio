@@ -967,7 +967,7 @@ Begin
                   And    mes       = @PnMes)
          Begin
             Begin Try
-               Delete dbo.MovimientoAnio
+               Delete dbo.MovimientosAnio
                Where  ejercicio = @PnAnio
                And    mes       = @PnMes;
 
