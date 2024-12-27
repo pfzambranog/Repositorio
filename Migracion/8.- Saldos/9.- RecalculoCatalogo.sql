@@ -13,12 +13,12 @@ Declare
    @PnEstatus                 Integer,
    @w_registros               Integer,
    @w_secuencia               Integer,
+   @w_linea                   Integer,
    @w_mes                     Tinyint,
    @w_mesMax                  Tinyint,
-   @w_linea                   Integer,
    @w_comilla                 Char(1),
-   @w_mensaje                 Varchar(  Max),
    @w_idusuario               Varchar(  Max),
+   @w_desc_error              Varchar(  750),
    @PsMensaje                 Varchar(  750),
    @w_usuario                 Nvarchar(  20),
    @w_sql                     NVarchar(1500),
@@ -36,7 +36,9 @@ Begin
           @w_registros = 0,
           @w_secuencia = 0,
           @w_inicio    = 1,
-          @w_ultactual = Getdate()
+          @w_ultactual = Getdate(),
+          @PnEstatus   = 0,
+          @PsMensaje   = Char(32);
 
    Select @w_mesMax    = Max(valor)
    From   catCriteriosTbl
@@ -65,6 +67,7 @@ Begin
   (Llave        Varchar(20)    Not Null,
    Moneda       Varchar( 2)    Not Null,
    Niv          Smallint       Not Null,
+   Descrip      Varchar(100)   Not Null,
    Sant         Decimal        Not Null Default 0,
    Car          Decimal(18, 2) Not Null,
    Abo          Decimal(18, 2) Not Null,
@@ -81,9 +84,13 @@ Begin
    Insert Into #tempControl
    (ejercicio, mes)
    Select Distinct ejercicio, mes
-   From   dbo.catalogos With (Nolock)
+   From   dbo.CatalogoAuxiliar With (Nolock)
+   Union
+   Select Distinct ejercicio, mes
+   From   dbo.CatalogoAuxiliarHist With (Nolock)
    Order  By 1, 2;
    Set @w_registros = @@Rowcount
+
    If @w_registros = 0
       Begin
          Select  @PnEstatus = 9999,
@@ -93,13 +100,14 @@ Begin
          Goto Salida
       End
 
-   While @secuencia < @w_registros
+
+   While @w_secuencia < @w_registros
    Begin
       Set @w_secuencia = @w_secuencia + 1;
 
-      Select ejercicio = @w_ejercicio,
-             mes       = @w_mes
-      From   #tempControl;
+      Select @w_ejercicio = ejercicio,
+             @w_mes       = mes
+      From   #tempControl
       Where  secuencia = @w_secuencia;
       If @@Rowcount = 0
          Begin
@@ -110,14 +118,22 @@ Begin
          Insert Into #TempCatalogo
         (Llave,     Moneda, Niv,        Sant,
          Car,       Abo,    CarProceso, AboProceso,
-         Ejercicio, mes)
+         Ejercicio, mes,    Descrip)
          Select Llave,     Moneda, Niv,        Sant,
                 Car,       Abo,    CarProceso, AboProceso,
-                Ejercicio, mes
-         From   dbo.catAuxiliares With (Nolock)
+                Ejercicio, mes,    descrip
+         From   dbo.CatalogoAuxiliar With (Nolock)
          Where  Ejercicio    = @w_ejercicio
          And    mes          = @w_mes
-         And    sucursal_id = 0;
+         And    sucursal_id  = 0
+         Union
+         Select Llave,     Moneda, Niv,        Sant,
+                Car,       Abo,    CarProceso, AboProceso,
+                Ejercicio, mes,    Descrip
+         From   dbo.CatalogoAuxiliarHist With (Nolock)
+         Where  Ejercicio    = @w_ejercicio
+         And    mes          = @w_mes
+         And    sucursal_id  = 0;
 
       End Try
 
@@ -138,52 +154,25 @@ Begin
             Goto Salida
          End
 
+      Insert Into #TempCatalogo
+     (Llave,     Moneda, Niv,        Sant,
+      Car,       Abo,    CarProceso, AboProceso,
+      Ejercicio, mes,    Descrip)
+      Select Concat(Substring(llave, 1, 10), Replicate(0, 6)),
+             Moneda,    0 Niv,                  Sum(Sant),
+             Sum(Car),  Sum(Abo),  Sum(CarProceso), Sum(AboProceso),
+             Ejercicio, mes,       Isnull((Select Top 1 descripcion
+                                           From   dbo.CatalogoConsolidado With (Nolock)
+                                           Where  numerodecuenta = Concat(Substring(llave, 1, 10), Replicate(0, 6))
+                                           And    moneda_id      = a.moneda), Char(32))
+      From   #TempCatalogo a
+      Group  By Concat(Substring(llave, 1, 10), Replicate(0, 6)),
+                Moneda, Ejercicio, mes;
+
       Begin Try
-         Insert Into  #TempCatalogo
-        (Llave,     Moneda, Niv,        Sant,
-         Car,       Abo,    CarProceso,  AboProceso,
-         ejercicio, mes)
-         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 2 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv         = 1
-         Group  By Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 3 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv          = 1
-         Group  By Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 4 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 5 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 6 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 7 Niv, Sum(Sant),
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, a.ejercicio, a.mes
+         Delete dbo.Catalogo
+         Where  ejercicio = @w_ejercicio
+         And    mes       = @w_mes;
       End Try
 
       Begin Catch
@@ -195,10 +184,11 @@ Begin
 
       If IsNull(@w_error, 0) <> 0
          Begin
+
             Select @PnEstatus = @w_error,
                    @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
 
-            Set Xact_Abort Off
+            Set  Xact_Abort Off
             Goto Salida
          End
 
@@ -207,17 +197,10 @@ Begin
         (Llave,       Moneda,      Niv,     Descrip,    SAnt,
          Car,         Abo,         SAct,    CarProceso, AboProceso,
          Ejercicio,   Mes)
-         Select Llave,     Moneda,  Niv,        ' ' Descrip, 0,
-                Car,       Abo,     Car - Abo,  CarProceso,  AboProceso,
+         Select Llave,     Moneda,  Niv,                     Descrip,     SAnt,
+                Car,       Abo,     a.SAnt + a.Car - a.abo,  CarProceso,  AboProceso,
                 Ejercicio, mes
          From   #TempCatalogo a
-         Where  Not Exists ( Select Top 1 1
-                             From   dbo.catalogo With (Nolock)
-                             Where  ejercicio = a.ejercicio
-                             And    mes       = a.mes
-                             And    llave     = a.llave
-                             And    moneda    = a.moneda
-                             And    Niv       = a.Niv)
 
       End Try
 
@@ -237,106 +220,20 @@ Begin
             Set  Xact_Abort Off
             Goto Salida
          End
-
-      Begin Try
-         Update dbo.Catalogo
-         Set    sAct       = a.SAnt + a.Car - a.abo
-         From   dbo.Catalogo a With (Nolock)
-         Where  a.ejercicio = @PnAnio
-         And    a.mes       = @PnMes
-
-
-      End Try
-
-      Begin Catch
-         Select  @w_Error      = @@Error,
-                 @w_linea      = Error_line(),
-                 @w_desc_error = Substring (Error_Message(), 1, 200)
-
-      End Catch
-
-      If IsNull(@w_error, 0) <> 0
-         Begin
-            Select @PnEstatus = @w_error,
-                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-            Set  Xact_Abort Off
-            Goto Salida
-         End
-
-      Begin Try
-         Update dbo.Catalogo
-         Set    Descrip = b.Descripcion
-         From   dbo.Catalogo a
-         Join   dbo.CatalogoConsolidado b
-         On     b.numerodecuenta = a.llave
-         And    b.moneda_id      = a.moneda
-         Where  a.ejercicio      = @PnAnio
-         And    a.mes            = @PnMes
-         And    a.Descrip        = '';
-
-      End Try
-
-      Begin Catch
-         Select  @w_Error      = @@Error,
-                 @w_linea      = Error_line(),
-                 @w_desc_error = Substring (Error_Message(), 1, 200)
-
-      End Catch
-
-      If IsNull(@w_error, 0) <> 0
-         Begin
-            Select @PnEstatus = @w_error,
-                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-            Set Xact_Abort Off
-            Goto Salida
-         End
-
---
--- Actualización del catálogo del período.
---
-
-      Begin Try
-         Update dbo.Catalogo
-         Set    Sant       = b.Sant,
-                car        = b.car,
-                abo        = b.Abo,
-                CarProceso = b.CarProceso,
-                AboProceso = b.AboProceso
-         From   dbo.Catalogo  a
-         Join   #TempCatalogo b  With (Nolock)
-         On     b.llave     = a.llave
-         And    b.moneda    = a.moneda
-         And    b.ejercicio = a.ejercicio
-         And    b.mes       = a.mes
-         Where  a.ejercicio = @w_ejercicio
-         And    a.mes       = @w_mes
-
-      End Try
-
-      Begin Catch
-         Select  @w_Error      = @@Error,
-                 @w_linea      = Error_line(),
-                 @w_desc_error = Substring (Error_Message(), 1, 200)
-
-      End Catch
-
-      If IsNull(@w_error, 0) <> 0
-         Begin
-            Select @PnEstatus = @w_error,
-                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-            Set Xact_Abort Off
-            Goto Salida
-         End
-
 
       Truncate Table #TempCatalogo;
 
    End;
 
 Salida:
+
+   If @PnEstatus = 0
+      Begin
+         Set @PsMensaje = 'Proceso Terminado Ok'
+      End
+
+   Drop Table #tempControl
+   Drop Table #TempCatalogo
 
    Select @PnEstatus Error, @PsMensaje Mensaje
 
@@ -345,4 +242,3 @@ Salida:
 
 End
 Go
-

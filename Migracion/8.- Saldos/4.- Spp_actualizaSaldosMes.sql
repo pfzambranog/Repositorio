@@ -511,47 +511,13 @@ Begin
         (Llave, Moneda,      Niv,          Car,
          Abo,   CarProceso,  AboProceso,   ejercicio,
          mes)
-         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 2 Niv,
+         Select Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, 0 Niv,
                 Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
                 a.ejercicio, a.mes
          From   #TempCatalogo a
          Where  a.Niv         = 1
-         Group  By Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, 3 Niv,
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv          = 1
-         Group  By Concat(Substring(a.llave, 1, 8), Replicate(0, 8)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, 4 Niv,
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 6), Replicate(0, 10)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, 5 Niv,
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 4), Replicate(0, 12)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, 6 Niv,
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 2), Replicate(0, 14)), a.Moneda, a.ejercicio, a.mes
-         Union
-         Select Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, 7 Niv,
-                Sum(a.car), Sum(a.Abo), Sum(a.CarProceso), Sum(a.AboProceso),
-                a.ejercicio, a.mes
-         From   #TempCatalogo a
-         Where  a.Niv           = 1
-         Group  By Concat(Substring(a.llave, 1, 1), Replicate(0, 15)), a.Moneda, a.ejercicio, a.mes
+         Group By Concat(Substring(a.llave, 1, 10), Replicate(0, 6)), a.Moneda,
+                  a.ejercicio, a.mes
       End Try
 
       Begin Catch

@@ -78,6 +78,12 @@ Begin
    Union
    Select 'criterio', 1, 'SI', '', 1, Getdate(),  dbo.Fn_BuscaDireccionIP(),  dbo.Fn_Busca_DireccionMac();
 
+   Insert Into dbo.catCriteriosTbl
+  (criterio,  valor,    descripcion, valorAdicional, idEstatus, fechaAct, ipAct, macAddressAct)
+   Select 'nivelContable', 0, 'Mayor', '', 1, Getdate(),  dbo.Fn_BuscaDireccionIP(),  dbo.Fn_Busca_DireccionMac()
+   Union
+   Select 'nivelContable', 1, 'Auxiliar', '', 1, Getdate(),  dbo.Fn_BuscaDireccionIP(),  dbo.Fn_Busca_DireccionMac();
+
    Return
 
 End

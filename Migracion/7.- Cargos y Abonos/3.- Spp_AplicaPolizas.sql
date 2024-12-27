@@ -32,9 +32,14 @@
 -- MODIFICACIONES:
 -- V1.0. [Zayra Mtz. Candia].[24Nov2022]. Se quita comentario a la linea 82, donde estaba comentado la variable de la condicion.
 
--- Fecha:         17/08/20
+-- Fecha:         17/08/2024
 -- Programador:   Pedro Zambrano
 -- Observaciones: Se hace reingreniería al proceso de aplicación de pólizas a cargos y abonos.
+-- Pro Original:  sp_poliza.
+
+-- Fecha:         27/12/2024
+-- Programador:   Pedro Zambrano
+-- Observaciones: Se axtualiza la distribución de nivel en la tabla catálogos a 1 y 0.
 -- Pro Original:  sp_poliza.
 
 */
@@ -63,14 +68,8 @@ Declare
     @w_desc_error        Varchar(250),
     @w_sql               Varchar(Max),
     @w_llave             Varchar( 16),
-    @w_nivel             varchar(  2),
-    @w_sector            Varchar(  2),
-    @w_NCta              Varchar( 16),
-    @w_Aux               Varchar( 16),
     @w_ctaMayor          Varchar( 16),
-    @w_SubCta            Varchar( 16),
-    @w_SSubCta           Varchar( 16),
-    @w_SSSubCta          Varchar( 16),
+    @w_sector            Varchar(  2),
     @w_Ceros             Varchar( 16),
     @w_importe           Decimal(18, 2),
     @w_poliza            Sysname,
@@ -290,17 +289,12 @@ Begin
             Break
          End
 
-      Select @w_Aux      = Substring  (@w_llave, 11, 6)                  ,
-             @w_NCta     = Substring  (@w_llave,  7, 2)                  , -- Valor 00
-             @w_SSSubCta = Concat(Left(@w_llave, 10), Right(@w_Ceros,6)) , -- Variable que se encarga de la SSSubCta--
-             @w_SSubCta  = Concat(Left(@w_llave, 8) , Right(@w_Ceros,8)) , -- Variable que se encarga de la SSubCta--
-             @w_SubCta   = Concat(Left(@w_llave, 6) , Right(@w_Ceros,10)), -- Variable que se encarga de la SubCta--
-             @w_ctaMayor = Concat(Left(@w_llave, 4) , Right(@w_Ceros,12))  -- Variable que se encarga de la Cta Mayor
+      Set @w_ctaMayor = Concat(Substring(@w_llave, 1, 10), Replicate(0, 6)) -- Variable que se encarga de la cuenta mayor
 
 
 -- COMPARACION DEL MES EN CURSO Y MES CERRADO--
 -- Si el mes en curso es igual al mes cerrado, solo se va actualizar los catalogos contables.
--- Catálogo Consolidado, Catalogo y Catalogo Auxiliar.
+-- Catalogo y Catalogo Auxiliar.
 
 -- INICIO DE LA COMPARACION DEL MES, CUANDO CUMPLE CON LA CONDICION
 
@@ -310,44 +304,40 @@ Begin
          --En SICCORP se manejan dos tipos de Clave.
          --El primer tipo es C corresponde a CARGO.
 
-            If @w_sucursal = 0
+            Set @w_sql = 'Update dbo.' + @w_catalogo + ' '       +
+                         'Set ' + Case When @w_clave = 'C'
+                                       Then + ' CarExt        = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
+                                              ' CarProceso    = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                       Else + ' AboExt        = AboExt + '     + Convert(Varchar, @w_importe) + ', '         +
+                                              ' AboProceso    = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                  End
+               
+            Set @w_sql = @w_sql   + 'Where Llave       = ' + @w_comilla  + @w_llave        + @w_comilla + ' ' +
+                                    'And   Moneda      = ' + @w_comilla  + @w_moneda_id    + @w_comilla + ' ' +
+                                    'And   Ejercicio   = ' + Cast(@PnAnio      As Varchar) + ' ' +
+                                    'And   Mes         = ' + Cast(@PnIdMes     As Varchar) + ' ';
+
+            Begin Try
+               Execute(@w_sql)
+            End Try
+
+            Begin Catch
+               Select @w_Error      = @@Error,
+                      @w_linea      = Error_line(),
+                      @w_desc_error = Substring (Error_Message(), 1, 200)
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
                Begin
-                  Set @w_sql = 'Update dbo.' + @w_catalogo + ' '       +
-                               'Set ' + Case When @w_clave = 'C'
-                                             Then + ' CarExt        = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
-                                                    ' CarProceso    = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                             Else + ' AboExt        = AboExt + '     + Convert(Varchar, @w_importe) + ', '         +
-                                                    ' AboProceso    = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                        End
-
-                  Set @w_sql = @w_sql   + 'Where Llave       = ' + @w_comilla  + @w_llave        + @w_comilla + ' ' +
-                                          'And   Moneda      = ' + Cast(@w_moneda_id As Varchar) + ' ' +
-                                          'And   Ejercicio   = ' + Cast(@PnAnio      As Varchar) + ' ' +
-                                          'And   Mes         = ' + Cast(@PnIdMes     As Varchar) + ' ';
-
-
-                  Begin Try
-                     Execute(@w_sql)
-                  End Try
-
-                  Begin Catch
-                     Select @w_Error      = @@Error,
-                            @w_linea      = Error_line(),
-                            @w_desc_error = Substring (Error_Message(), 1, 200)
-                  End Catch
-
-                  If IsNull(@w_error, 0) <> 0
-                     Begin
-                        Select @PnEstatus = @w_error,
-                               @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-                        Insert Into dbo.Bitacora_CargosAbonos
-                        (mensaje, idError, mensajeError, ultActual )
-                        Values ('ERROR 9', @w_error, @w_desc_error, getdate());
-
-                        Set Xact_Abort Off
-                        Return
-                     End
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+            
+                  Insert Into dbo.Bitacora_CargosAbonos
+                  (mensaje, idError, mensajeError, ultActual )
+                  Values ('ERROR 9', @w_error, @w_desc_error, getdate());
+            
+                  Set Xact_Abort Off
+                  Return
                End
 
             Set @w_sql = 'Update ' + @w_catalagoAux + ' '                                                               +
@@ -365,7 +355,6 @@ Begin
                                   'And   Region_id   = ' + Convert(Varchar, @w_region)                 + ' ' +
                                   'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)                   + ' ' +
                                   'And   mes         = ' + Convert(Varchar, @PnIdMes)
-
             Begin Try
                Execute(@w_sql)
             End Try
@@ -390,40 +379,35 @@ Begin
                   Return
                End
 
--- Actualiza los saldos de la subcta y cuenta mayor correspondiente, en el catalogoo.
+--
+-- Actualización Sucursal 0 en catalogoAuxiliar
+--
 
-            If @w_sucursal = 0
+            If @w_sucursal != 0
                Begin
-                  Set @w_sql =  'Update dbo.' + @w_catalogo + ' '                                                     +
-                                'Set ' + Case When @w_clave = 'C'
-                                              Then 'CarExt     = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
-                                                   'CarProceso = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                              Else 'AboExt     = AboExt     + ' + Convert(Varchar, @w_importe) + ', ' +
-                                                   'AboProceso = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                         End
+                  Set @w_sql = 'Update ' + @w_catalagoAux + ' '                                                               +
+                               'Set ' + Case When @w_clave = 'C'
+                                             Then ' CarExt        = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
+                                                  ' CarProceso    = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                             Else ' AboExt        = AboExt + '     + Convert(Varchar, @w_importe) + ', '     +
+                                                  ' AboProceso    = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                             End
                   
-                  Set @w_sql = @w_sql + 'Where Niv      = 0 '                                                         +
-                                        'And   Llave   In (' + Case When @w_NCta = '00'
-                                                                    Then @w_comilla + @w_SubCta   + @w_comilla + ', ' +
-                                                                         @w_comilla + @w_ctaMayor + @w_comilla
-                                                                    Else @w_comilla + @w_SSSubCta + @w_comilla + ', ' +
-                                                                         @w_comilla + @w_SSubCta  + @w_comilla + ', ' +
-                                                                         @w_comilla + @w_SubCta   + @w_comilla +' , ' +
-                                                                         @w_comilla + @w_ctaMayor      + @w_comilla
-                                                               End + ') ' +
-                                        'And   Moneda      = ' + @w_comilla + @w_moneda_id  + @w_comilla + ' ' +
-                                        'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)               + ' ' +
+                  Set @w_sql = @w_sql + 'Where Llave       = ' + @w_comilla + @w_llave       + @w_comilla    + ' ' +
+                                        'And   Moneda      = ' + @w_comilla + @w_moneda_id   + @w_comilla    + ' ' +
+                                        'And   Sucursal_id = 0 ' + 
+                                        'And   Ejercicio   = ' + Convert(Varchar, @PnAnio)                   + ' ' +
                                         'And   mes         = ' + Convert(Varchar, @PnIdMes)
-                  
+
                   Begin Try
                      Execute(@w_sql)
                   End Try
-                  
+
                   Begin Catch
+                  
                      Select @w_error      = Error_Number(),
                             @w_linea      = Error_line(),
                             @w_desc_error = Error_Message()
-                  
                   End Catch
                   
                   If IsNull(@w_error, 0) <> 0
@@ -431,15 +415,55 @@ Begin
                         Select @PnEstatus = @w_error,
                                @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
                   
-                            Insert Into dbo.Bitacora_CargosAbonos
-                            (mensaje, idError, mensajeError, ultactual )
-                            Values ('ERROR 12', @w_error, @w_desc_error, @w_fechaCaptura);
+                        Insert Into dbo.Bitacora_CargosAbonos
+                        (mensaje, idError, mensajeError, ultactual)
+                        Values ('ERROR 11', @w_error, @w_desc_error, getdate());
                   
-                            Set Xact_Abort Off
-                            Return
+                        Set Xact_Abort Off
+                        Return
                      End
+
                End
 
+-- Actualiza los saldos de la subcta y cuenta mayor correspondiente, en el catalogoo.
+
+            Set @w_sql =  'Update dbo.' + @w_catalogo + ' '                                                     +
+                          'Set ' + Case When @w_clave = 'C'
+                                        Then 'CarExt     = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
+                                             'CarProceso = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                        Else 'AboExt     = AboExt     + ' + Convert(Varchar, @w_importe) + ', ' +
+                                             'AboProceso = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                    End
+
+            Set @w_sql = @w_sql + 'Where Niv       = 0 '                                                         +
+                                  'And   Llave     = ' + @w_comilla + @w_ctaMayor   + @w_comilla      + ' ' +
+                                  'And   Moneda    = ' + @w_comilla + @w_moneda_id  + @w_comilla + ' ' +
+                                  'And   Ejercicio = ' + Convert(Varchar, @PnAnio)               + ' ' +
+                                  'And   mes       = ' + Convert(Varchar, @PnIdMes)
+
+            Begin Try
+               Execute(@w_sql)
+            End Try
+
+            Begin Catch
+               Select @w_error      = Error_Number(),
+                      @w_linea      = Error_line(),
+                      @w_desc_error = Error_Message()
+
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
+               Begin
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+
+                  Insert Into dbo.Bitacora_CargosAbonos
+                 (mensaje, idError, mensajeError, ultactual )
+                  Values ('ERROR 12', @w_error, @w_desc_error, @w_fechaCaptura);
+
+                  Set Xact_Abort Off
+                  Return
+               End
          End
 
 -- CUANDO NO CUMPLE CON LA CONDICION DE LOS MESES QUE SEAN IGUALES--
@@ -453,45 +477,42 @@ Begin
 -- SI NO EXISTE, SE UTILIZA EN LA SENTENCIA Insert,
 -- PARA AÑADIR UN ELEMENTO, EVITANDOAÑADIR REGISTROS DUPLICADOS
 
-            If @w_sucursal = 0
+            Set @w_sql = 'Update ' + @w_catalogo     + ' '                                                     +
+                         'Set ' + Case When @w_clave = 'C'
+                                       Then 'CarExt     = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
+                                            'CarProceso = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                       Else 'AboExt     = AboExt + '     + Convert(Varchar, @w_importe) + ', ' +
+                                            'AboProceso = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
+                                  End
+
+            Set @w_sql = @w_sql   + 'Where Llave       = ' + @w_comilla  + @w_llave        + @w_comilla + ' ' +
+                                    'And   Moneda      = ' + @w_comilla  + @w_moneda_id    + @w_comilla + ' ' +
+                                    'And   Ejercicio   = ' + Cast(@PnAnio      As Varchar) + ' ' +
+                                    'And   Mes         = ' + Cast(@PnIdMes     As Varchar);
+
+            Begin try
+               Execute (@w_sql)
+            End Try
+
+            Begin Catch
+               Select @w_error      = Error_Number(),
+                      @w_linea      = Error_line(),
+                      @w_desc_error = Error_Message()
+            
+            End Catch
+
+            If IsNull(@w_error, 0) <> 0
                Begin
-                  Set @w_sql = 'Update ' + @w_catalogo     + ' '                                                     +
-                               'Set ' + Case When @w_clave = 'C'
-                                             Then 'CarExt     = CarExt + '     + Convert(Varchar, @w_importe) + ', ' +
-                                                  'CarProceso = CarProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                             Else 'AboExt     = AboExt + '     + Convert(Varchar, @w_importe) + ', ' +
-                                                  'AboProceso = AboProceso + ' + Convert(Varchar, @w_importe) + ' '
-                                        End
-                  
-                  Set @w_sql = @w_sql   + 'Where Llave       = ' + @w_comilla  + @w_llave        + @w_comilla + ' ' +
-                                          'And   Moneda      = ' + Cast(@w_moneda_id As Varchar) + ' ' +
-                                          'And   Ejercicio   = ' + Cast(@PnAnio      As Varchar) + ' ' +
-                                          'And   Mes         = ' + Cast(@PnIdMes     As Varchar);
-                  
-                  Begin try
-                     Execute (@w_sql)
-                  End Try
-                  
-                  Begin Catch
-                     Select @w_error      = Error_Number(),
-                            @w_linea      = Error_line(),
-                            @w_desc_error = Error_Message()
-                  
-                  End Catch
-                  
-                  If IsNull(@w_error, 0) <> 0
-                     Begin
-                        Select @PnEstatus = @w_error,
-                               @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-                  
-                        Insert Into dbo.Bitacora_CargosAbonos
-                        (mensaje, idError, mensajeError, ultactual )
-                        Values ('ERROR 14 ', @w_error, @w_desc_error, @w_fechaCaptura);
-                  
-                        Set Xact_Abort Off
-                        Return
-                     End
-                End
+                  Select @PnEstatus = @w_error,
+                         @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
+            
+                  Insert Into dbo.Bitacora_CargosAbonos
+                  (mensaje, idError, mensajeError, ultactual )
+                  Values ('ERROR 14 ', @w_error, @w_desc_error, @w_fechaCaptura);
+            
+                  Set Xact_Abort Off
+                  Return
+               End
 
 --Inserta en la tabla CATAUXREPAÑO, la cta, sucursal y region correspondiente saldo cero, en el mes en curso.
 
@@ -501,7 +522,7 @@ Begin
                                         'And    mes         = ' + Cast(@PnIdMes As Varchar)              + ' '  +
                                         'And    Llave       = ' + @w_comilla + @w_llave     + @w_comilla + ' '  +
                                         'And    Moneda_id   = ' + @w_comilla + @w_moneda_id + @w_comilla + ' '  +
-                                        'And    Sector_id   = ' + @w_comilla + @w_sector + @w_comilla    + ' '  +
+                                        'And    Sector_id   = ' + @w_comilla + @w_sector    + @w_comilla + ' '  +
                                         'And    Sucursal_id = ' + Convert(Varchar, @w_sucursal)          + ' '  +
                                         'And    Region_id   = ' + Convert(Varchar, @w_region)            + ') ' +
                             'Begin '                                                                     +
@@ -727,11 +748,10 @@ Begin
                          'Else '                                                                                                +
                             'Begin ' +
                                'Update dbo.' + @w_catReporte   + ' ' +
-                               'Set   SAct   = SAct  + ' +
-                                                          Case When @w_clave = 'C'
-                                                            Then Cast(@w_importe  As Varchar)
-                                                            Else Cast(-@w_importe As Varchar)
-                                                          End + ' ' +
+                               'Set   SAct   = SAct  + ' + Case When @w_clave = 'C'
+                                                                Then Cast(@w_importe  As Varchar)
+                                                                Else Cast(-@w_importe As Varchar)
+                                                           End + ' ' +
                                'Where  ejercicio = '   + Cast(@PnAnio      As Varchar)          + ' ' +
                                'And    mes       = '   + Cast(@PnIdMes     As Varchar)          + ' ' +
                                'And    Llave     = '   + @w_comilla + @w_llave     + @w_comilla + ' ' +
@@ -754,7 +774,7 @@ Begin
                   Select @PnEstatus = @w_error,
                          @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
 
-Select @w_sql
+
                   Insert Into dbo.Bitacora_CargosAbonos
                   (mensaje, idError, mensajeError, ultactual )
                   Values ('ERROR 20', @w_error, @w_desc_error, @w_fechaCaptura);
@@ -1005,28 +1025,18 @@ Select @w_sql
                                    'CarProceso = CarProceso + ' + Convert(Varchar, @w_importe)  + '  '  +
                                    'Where Ejercicio = ' + Cast(@PnAnio  As Varchar)             + '  '  +
                                    'And   mes       = ' + Cast(@PnIdMes As Varchar)             + '  '  +
-                                   'And   Moneda    = ' + Cast(@w_moneda_id As Varchar)         + '  '  +
+                                   'And   Moneda    = ' + @w_comilla + @w_moneda_id + @w_comilla        + '  '  +
                                    'And   Niv       = 0 '                                               +
-                                   'And   Llave    ' +  Case When @w_NCta = '00'
-                                                             Then ' In ( '+ @w_comilla + @w_SubCta   + @w_comilla + ', ' + @w_comilla + @w_ctaMayor + @w_comilla + ') '
-                                                             Else ' In ( '+ @w_comilla + @w_SSSubCta + @w_comilla + ', ' + @w_comilla + @w_SSubCta  + @w_comilla + ', ' +
-                                                                  '      '+ @w_comilla + @w_SubCta   + @w_comilla + ', ' + @w_comilla + @w_ctaMayor + @w_comilla + ') '
-                                                        End
+                                   'And   Llave     = ' +  @w_comilla + @w_ctaMayor + @w_comilla
                               Else 'AboExt          = AboExt     + ' + Convert(Varchar, @w_importe) + ', '              +
                                    'AboProceso      = AboProceso + ' + Convert(Varchar, @w_importe) + ' '           +
-                                   'Where Ejercicio = ' + Cast(@PnAnio  As Varchar)             + '  '  +
-                                   'And   mes       = ' + Cast(@PnIdMes As Varchar)             +  ' '  +
-                                   'And   Moneda    =  ' + Cast(@w_moneda_id As Varchar)           + '  '                   +
-                                   'And   Niv       =  0  '                                                             +
-                                   'And   Llave    ' + Case When @w_NCta = '00'
-                                                            Then ' In( ' + @w_comilla + @w_SubCta   + @w_comilla + ', '   +
-                                                                         + @w_comilla + @w_ctaMayor + @w_comilla + ') '
-                                                            Else ' In( ' + @w_comilla + @w_SSSubCta + @w_comilla + ', '  +
-                                                                      + @w_comilla + @w_SSubCta  + @w_comilla + ', '  +
-                                                                      + @w_comilla + @w_SubCta   + @w_comilla + ', '  +
-                                                                      + @w_comilla + @w_ctaMayor + @w_comilla + ')'
-                                                       End
+                                   'Where Ejercicio = '  + Cast(@PnAnio  As Varchar)              + ' '  +
+                                   'And   mes       = '  + Cast(@PnIdMes As Varchar)              + ' '  +
+                                   'And   Moneda    = '  + @w_comilla + @w_moneda_id + @w_comilla + ' '                   +
+                                   'And   Niv       =  0 '                                        +
+                                   'And   Llave     = '  + @w_comilla + @w_ctaMayor + @w_comilla  + ' '
                          End
+
 
    Begin try
        Execute (@w_sql)
