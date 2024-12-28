@@ -150,77 +150,19 @@ Begin
             Select @PnEstatus = @w_error,
                    @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
 
-            Set Xact_Abort Off
             Goto Salida
          End
 
-      Insert Into #TempCatalogo
-     (Llave,     Moneda, Niv,        Sant,
-      Car,       Abo,    CarProceso, AboProceso,
-      Ejercicio, mes,    Descrip)
-      Select Concat(Substring(llave, 1, 10), Replicate(0, 6)),
-             Moneda,    0 Niv,                  Sum(Sant),
-             Sum(Car),  Sum(Abo),  Sum(CarProceso), Sum(AboProceso),
-             Ejercicio, mes,       Isnull((Select Top 1 descripcion
-                                           From   dbo.CatalogoConsolidado With (Nolock)
-                                           Where  numerodecuenta = Concat(Substring(llave, 1, 10), Replicate(0, 6))
-                                           And    moneda_id      = a.moneda), Char(32))
-      From   #TempCatalogo a
-      Group  By Concat(Substring(llave, 1, 10), Replicate(0, 6)),
-                Moneda, Ejercicio, mes;
+      Execute dbo.Spp_recalculoNivelCatalogo @PnEjercicio = @w_ejercicio,
+                                             @PnMes       = @w_mes, 
+                                             @PnEstatus   = @PnEstatus  Output,
+                                             @PsMensaje   = @PsMensaje  Output;
 
-      Begin Try
-         Delete dbo.Catalogo
-         Where  ejercicio = @w_ejercicio
-         And    mes       = @w_mes;
-      End Try
-
-      Begin Catch
-         Select  @w_Error      = @@Error,
-                 @w_linea      = Error_line(),
-                 @w_desc_error = Substring (Error_Message(), 1, 200)
-
-      End Catch
-
-      If IsNull(@w_error, 0) <> 0
+      If @PnEstatus != 0
          Begin
-
-            Select @PnEstatus = @w_error,
-                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-            Set  Xact_Abort Off
             Goto Salida
          End
-
-      Begin Try
-         Insert Into dbo.Catalogo
-        (Llave,       Moneda,      Niv,     Descrip,    SAnt,
-         Car,         Abo,         SAct,    CarProceso, AboProceso,
-         Ejercicio,   Mes)
-         Select Llave,     Moneda,  Niv,                     Descrip,     SAnt,
-                Car,       Abo,     a.SAnt + a.Car - a.abo,  CarProceso,  AboProceso,
-                Ejercicio, mes
-         From   #TempCatalogo a
-
-      End Try
-
-      Begin Catch
-         Select  @w_Error      = @@Error,
-                 @w_linea      = Error_line(),
-                 @w_desc_error = Substring (Error_Message(), 1, 200)
-
-      End Catch
-
-      If IsNull(@w_error, 0) <> 0
-         Begin
-
-            Select @PnEstatus = @w_error,
-                   @PsMensaje = Concat('Error.: ', @w_Error, ' ', @w_desc_error, ' en Línea ', @w_linea);
-
-            Set  Xact_Abort Off
-            Goto Salida
-         End
-
+            
       Truncate Table #TempCatalogo;
 
    End;
