@@ -67,7 +67,7 @@ Begin
 -- Generacion de Tabla temporal
 --
 
-   Create Table #TempCatalogo
+   Create Table #TempNivCatalogo
   (secuencia   Integer  Not Null Identity (1, 1) Primary Key,
    Llave        Varchar(20)    Not Null,
    Moneda       Varchar( 2)    Not Null,
@@ -87,7 +87,7 @@ Begin
 --
 
    Begin Try
-      Insert Into #TempCatalogo
+      Insert Into #TempNivCatalogo
      (Llave,     Moneda, Niv,        Sant,
       Car,       Abo,    CarProceso, AboProceso,
       Ejercicio, mes,    Descrip)
@@ -161,7 +161,7 @@ Begin
                 @w_Abo        = Abo,
                 @w_CarProceso = CarProceso,
                 @w_AboProceso = AboProceso
-         From   #TempCatalogo
+         From   #TempNivCatalogo
          Where  secuencia = @w_secuencia;
          If @@Rowcount = 0
             Begin
